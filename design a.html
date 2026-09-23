@@ -1,0 +1,31 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dragon Meat Vending Machine FINAL</title><style>
+html,body{margin:0;height:100%;overflow:hidden;background:#050505;font-family:Arial,sans-serif}
+.bg1,.bg2,.bg3,.bg4{position:fixed;inset:-30%;pointer-events:none}
+.bg1{background:repeating-conic-gradient(#f0f2 0 10deg,#0ff2 10deg 20deg,#0000 20deg 30deg);animation:r 35s linear infinite}
+.bg2{background:radial-gradient(circle at 20% 30%,#ff00ff66,transparent 20%),radial-gradient(circle at 80% 60%,#00ffff66,transparent 20%),radial-gradient(circle at 50% 50%,#ffff0066,transparent 25%);filter:blur(40px);animation:pulse 8s ease-in-out infinite}
+.bg3{background:repeating-linear-gradient(90deg,#fff1 0 2px,#0000 2px 80px),repeating-linear-gradient(0deg,#fff1 0 2px,#0000 2px 80px);transform:perspective(800px) rotateX(78deg) scale(2)}
+.bg4{background:radial-gradient(circle,#fff1 1px,#0000 2px);background-size:40px 40px;animation:r2 20s linear infinite}
+.scene{height:100%;display:flex;justify-content:center;align-items:center}
+.machine{width:440px;height:640px;border-radius:30px;position:relative;background:linear-gradient(145deg,#888,#2b2b2b);box-shadow:50px 50px 120px #000,inset 0 0 35px #ddd;color:#fff}
+.display{position:absolute;left:20px;right:20px;top:90px;background:#021;padding:10px;color:#6f6;border-radius:8px}
+.slot{position:absolute;right:20px;top:35px;width:90px;height:18px;background:#111}
+.grid{position:absolute;top:145px;left:20px;right:20px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{height:95px;position:relative;border-radius:15px;overflow:hidden;filter:brightness(.3);border:2px solid #555}
+.btn.active{filter:brightness(1.2);box-shadow:0 0 20px gold;cursor:pointer}
+.dr{position:absolute;inset:0;background:linear-gradient(135deg,var(--a),var(--b))}.dr:before{content:'◉';position:absolute;font-size:60px;left:10px;top:5px}.goo{position:absolute;inset:0;background:repeating-linear-gradient(120deg,#8a5 0 12px,#5f2 12px 22px);opacity:.5}.lab{position:absolute;bottom:3px;left:3px;background:#000a;padding:2px 4px;font-size:12px}
+.coinArea{position:absolute;bottom:22px;left:25px;display:flex;gap:12px;align-items:center}.coin{width:82px;height:82px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#f0c38d,#70411a);display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;box-shadow:0 10px 20px #000}
+.info{background:#0008;padding:6px;border-radius:8px;font-size:12px}
+.shake{animation:shake .08s infinite}
+.weapon{position:absolute;width:160px;height:12px;background:linear-gradient(90deg,#fff,#777)}
+.squirt{position:absolute;width:40px;height:65px;border-radius:60% 40% 70% 35%/40% 65% 35% 60%;background:radial-gradient(circle at 30% 20%,#dff,#7cffb2 40%,#2ca964);animation:goo .9s forwards}
+.meat{position:fixed;left:50%;top:50%;font-size:min(85vw,85vh);opacity:0;z-index:9999;filter:drop-shadow(0 25px 30px #000)}
+.jump{animation:jumpscare 7s forwards}
+.flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none}
+.flash.on{animation:flash .25s}
+@keyframes flash{50%{opacity:.8}}
+@keyframes jumpscare{0%{opacity:0;transform:translate(-50%,-50%) scale(.01)}5%{opacity:1;transform:translate(-50%,-50%) scale(2.6)}15%{transform:translate(-50%,-50%) scale(2.2)}100%{opacity:1;transform:translate(-50%,140vh) scale(1.6)}}
+@keyframes goo{0%{transform:scale(.2,.15)}30%{transform:scale(1.4,.7) rotate(25deg)}60%{transform:scale(.8,1.7) rotate(-20deg)}100%{transform:translateY(180px) scale(.25,2.2);opacity:0}}
+@keyframes shake{50%{transform:translate(10px,-8px) rotate(.8deg)}}
+@keyframes r{to{transform:rotate(360deg)}}@keyframes r2{to{transform:rotate(-360deg)}}@keyframes pulse{50%{transform:scale(1.2)}}
+</style></head><body><div class=bg1></div><div class=bg2></div><div class=bg3></div><div class=bg4></div><div class=flash id=flash></div><div class=scene><div class=machine id=machine><div class=slot></div><div id=display class=display>Credits: $0</div><div id=grid class=grid></div><div id=fx></div><div class=coinArea><div id=coin class=coin>$5</div><div class=info>Unlimited rusty tokens<br>Click to insert</div></div></div></div><script>
+const meats=[['coetyl',10],['sea ore',15],['arctic',20],['amphiptere',25],['loong',30],['feydragon',35],['hydra',40],['drake',45]];const cs=[['#f66','#933'],['#6cf','#036'],['#cff','#8ef'],['#fc9','#d70'],['#9f9','#393'],['#f9f','#939'],['#be8','#584'],['#faa','#f50']];let credit=0,busy=false;meats.forEach((m,i)=>{let d=document.createElement('div');d.className='btn';d.dataset.price=m[1];d.innerHTML=`<div class=dr style="--a:${cs[i][0]};--b:${cs[i][1]}"></div><div class=goo></div><div class=lab>${m[0]} ($${m[1]})</div>`;d.onclick=()=>buy(d);grid.appendChild(d)});function upd(){display.textContent='Credits: $'+credit;document.querySelectorAll('.btn').forEach(b=>b.classList.toggle('active',credit>=b.dataset.price&&!busy));}coin.onclick=()=>{if(!busy){credit+=5;upd();}};function buy(el){if(busy||credit<el.dataset.price)return;busy=true;credit-=+el.dataset.price;upd();machine.classList.add('shake');let iv=setInterval(()=>{for(let i=0;i<3;i++){let s=document.createElement('div');s.className='squirt';s.style.left=Math.random()*390+'px';s.style.top=120+Math.random()*350+'px';fx.appendChild(s);setTimeout(()=>s.remove(),900);}let w=document.createElement('div');w.className='weapon';w.style.left=Math.random()<.5?'-140px':'420px';w.style.top=120+Math.random()*350+'px';w.style.transform='rotate('+(Math.random()*120-60)+'deg)';fx.appendChild(w);setTimeout(()=>w.remove(),700);},70);setTimeout(()=>{clearInterval(iv);machine.classList.remove('shake');flash.classList.add('on');setTimeout(()=>flash.classList.remove('on'),250);let m=document.createElement('div');m.className='meat jump';m.textContent='🍖';document.body.appendChild(m);setTimeout(()=>{m.remove();busy=false;upd();},7000);},6000)}upd();</script></body></html>

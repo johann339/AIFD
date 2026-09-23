@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F3B3D5">
+<title>Johann — Style Guide</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Parisienne&display=swap');
+
+:root {
+  --background:#F3B3D5;
+  --text:#8C2D65;
+  --accent:#FF68B2;
+  --cream:#FFF8F0;
+  --paper:#FFF6FB;
+  --paper-soft:#FFD8E9;
+  --paper-deep:#FFAAD2;
+  --white:#FFFFFF;
+  --shadow:rgba(140,45,101,.17);
+}
+
+* { box-sizing:border-box; }
+
+html {
+  scroll-behavior:smooth;
+  background:var(--background);
+}
+
+body {
+  margin:0;
+  min-height:100vh;
+  overflow-x:hidden;
+  color:var(--text);
+  font-family:"Cormorant Garamond", Georgia, serif;
+  background:
+    radial-gradient(circle at 14% 12%, rgba(255,255,255,.38), transparent 20%),
+    radial-gradient(circle at 82% 22%, rgba(255,104,178,.16), transparent 25%),
+    linear-gradient(145deg, #F3B3D5, #F8C3DF 45%, #F3B3D5 78%, #FFB2D7);
+  background-size:130% 130%,140% 140%,180% 180%;
+  animation:bgShift 18s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0% { background-position:0 0,100% 10%,0 50%; }
+  100% { background-position:16% 12%,84% 24%,100% 50%; }
+}
+
+.lace {
+  position:fixed;
+  top:-10px;
+  z-index:15;
+  width:min(220px,29vw);
+  height:180px;
+  pointer-events:none;
+  opacity:.75;
+  filter:drop-shadow(0 7px 10px rgba(140,45,101,.08));
+  background:
+    radial-gradient(circle at 13px 13px, rgba(255,255,255,.96) 0 7px, transparent 8px) 0 0/26px 26px repeat,
+    radial-gradient(ellipse at 50% 0, rgba(255,247,251,.92) 0 50%, transparent 52%) 0 24px/54px 34px repeat-x;
+}
+
+.lace.left { left:-20px; transform:rotate(-6deg); }
+.lace.right { right:-20px; transform:scaleX(-1) rotate(-6deg); }
+
+.floating-layer {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+
+.floaty {
+  position:absolute;
+  color:rgba(255,255,255,.92);
+  text-shadow:0 0 9px rgba(255,255,255,.9),0 0 18px rgba(255,104,178,.45);
+  opacity:.62;
+  animation:
+    drift var(--speed,10s) ease-in-out infinite alternate,
+    shimmer 3.3s ease-in-out infinite;
+  will-change:transform,opacity;
+}
+
+.floaty.heart { color:rgba(255,104,178,.58); }
+.floaty.bow { color:rgba(140,45,101,.36); font-weight:600; }
+
+@keyframes drift {
+  from { transform:translate3d(0,0,0) rotate(-5deg); }
+  to { transform:translate3d(var(--dx,20px),var(--dy,-28px),0) rotate(7deg); }
+}
+@keyframes shimmer {
+  0%,100% { opacity:.30; }
+  50% { opacity:.82; }
+}
+
+.page {
+  position:relative;
+  z-index:1;
+  width:min(900px,calc(100% - 28px));
+  margin:0 auto;
+  padding:28px 0 88px;
+}
+
+.name {
+  margin:4px 0 0;
+  text-align:center;
+  font-family:"Parisienne", cursive;
+  font-weight:500;
+  font-size:clamp(3.6rem,8vw,6.4rem);
+  line-height:1;
+  text-shadow:0 3px 0 rgba(255,255,255,.46),0 0 22px rgba(255,255,255,.58);
+}
+
+.title-card {
+  position:relative;
+  margin:22px auto 52px;
+  padding:clamp(28px,5vw,48px);
+  text-align:center;
+  border:3px solid var(--accent);
+  border-radius:40px;
+  background:rgba(255,248,252,.90);
+  box-shadow:0 20px 50px var(--shadow);
+  backdrop-filter:blur(10px);
+  isolation:isolate;
+}
+
+.title-card::before,
+.title-card::after {
+  content:"";
+  position:absolute;
+  z-index:-2;
+  border-radius:42px;
+}
+
+.title-card::before {
+  inset:16px -14px -17px 11px;
+  background:var(--paper-deep);
+  transform:rotate(-1.4deg);
+}
+
+.title-card::after {
+  z-index:-1;
+  inset:8px 12px -8px -10px;
+  background:var(--paper-soft);
+  transform:rotate(.8deg);
+}
+
+.title-card h1 {
+  margin:0;
+  font-family:"Parisienne", cursive;
+  font-size:clamp(3rem,7vw,5.4rem);
+  line-height:1;
+  font-weight:500;
+  color:var(--text);
+}
+
+.title-card p {
+  max-width:600px;
+  margin:14px auto 0;
+  font-size:clamp(1.08rem,2.4vw,1.35rem);
+  line-height:1.45;
+  font-weight:500;
+}
+
+.ribbon {
+  position:absolute;
+  width:104px;
+  height:33px;
+  top:-15px;
+  background:repeating-linear-gradient(90deg,#FFE5F1 0 9px,#FFC7E1 9px 18px);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:0 4px 9px rgba(140,45,101,.08);
+  opacity:.92;
+}
+
+.ribbon.left { left:13%; transform:rotate(-5deg); }
+.ribbon.right { right:13%; transform:rotate(6deg); }
+
+.guide-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:34px;
+}
+
+.guide-card {
+  position:relative;
+  padding:clamp(24px,5vw,40px);
+  border:3px solid var(--accent);
+  border-radius:34px;
+  background:
+    linear-gradient(rgba(255,249,253,.93),rgba(255,249,253,.93)),
+    repeating-linear-gradient(0deg,transparent 0 31px,rgba(255,104,178,.10) 32px 33px);
+  box-shadow:0 16px 38px rgba(140,45,101,.14);
+  isolation:isolate;
+}
+
+.guide-card::before,
+.guide-card::after {
+  content:"";
+  position:absolute;
+  z-index:-2;
+  border-radius:36px;
+}
+
+.guide-card::before {
+  inset:12px -10px -13px 10px;
+  background:rgba(255,205,229,.91);
+  transform:rotate(var(--paper-tilt,-.75deg));
+}
+
+.guide-card::after {
+  z-index:-1;
+  inset:6px 8px -7px -7px;
+  background:rgba(255,240,248,.94);
+  transform:rotate(.45deg);
+}
+
+.guide-card:nth-child(even) { --paper-tilt:.8deg; }
+
+.guide-card h2 {
+  margin:0 0 18px;
+  font-family:"Parisienne", cursive;
+  font-size:clamp(2.3rem,5.2vw,3.7rem);
+  line-height:1.05;
+  font-weight:500;
+  color:var(--text);
+}
+
+.guide-card p {
+  margin:10px 0;
+  font-size:clamp(1.08rem,2vw,1.24rem);
+  line-height:1.5;
+}
+
+.guide-card .lead {
+  margin-top:3px;
+  color:var(--accent);
+  font-weight:600;
+  letter-spacing:.02em;
+}
+
+.guide-card .spec {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:500;
+}
+
+.guide-card ul {
+  margin:10px 0 20px;
+  padding-left:1.25rem;
+}
+
+.guide-card li {
+  margin:8px 0;
+  padding-left:4px;
+  font-size:clamp(1.06rem,2vw,1.22rem);
+  line-height:1.42;
+}
+
+.guide-card li::marker { color:var(--accent); }
+
+.pin {
+  position:absolute;
+  top:15px;
+  right:18px;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#FFF 0 18%,#FF9ACB 20% 50%,#FF68B2 52%);
+  box-shadow:0 2px 0 rgba(140,45,101,.14),0 0 12px rgba(255,104,178,.34);
+}
+
+.swatch {
+  flex:0 0 auto;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  box-shadow:0 3px 8px rgba(140,45,101,.12);
+}
+.swatch.bg { background:#F3B3D5; }
+.swatch.text { background:#8C2D65; }
+.swatch.accent { background:#FF68B2; }
+
+.charm {
+  position:absolute;
+  right:-27px;
+  top:38%;
+  width:40px;
+  display:grid;
+  justify-items:center;
+  color:var(--accent);
+  pointer-events:none;
+  filter:drop-shadow(0 4px 5px rgba(140,45,101,.15));
+}
+
+.charm::before {
+  content:"";
+  display:block;
+  width:3px;
+  height:58px;
+  background:repeating-linear-gradient(to bottom,var(--accent) 0 5px,transparent 5px 9px);
+}
+
+.charm span {
+  display:grid;
+  place-items:center;
+  width:29px;
+  height:29px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  background:var(--cream);
+  font-size:19px;
+}
+
+.demo-links {
+  margin:36px auto 0;
+  display:grid;
+  gap:12px;
+}
+
+.demo-link {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px 22px;
+  border:2px solid rgba(255,255,255,.72);
+  border-radius:999px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:1.15rem;
+  font-weight:600;
+  background:linear-gradient(90deg,#FFEAF4,#F8BADA 52%,#FF68B2);
+  box-shadow:0 7px 18px rgba(140,45,101,.11);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+
+.demo-link:hover,
+.demo-link:focus-visible {
+  transform:translateY(-4px);
+  box-shadow:0 14px 30px rgba(255,104,178,.32),0 0 20px rgba(255,104,178,.22);
+  outline:none;
+}
+
+.footer {
+  margin-top:38px;
+  text-align:center;
+  font-family:"Parisienne", cursive;
+  font-size:clamp(1.9rem,4vw,2.7rem);
+  font-weight:500;
+}
+
+.cursor-spark {
+  position:fixed;
+  z-index:9999;
+  left:0;
+  top:0;
+  pointer-events:none;
+  color:#fff;
+  font-size:var(--size,10px);
+  line-height:1;
+  text-shadow:0 0 6px #fff,0 0 13px rgba(255,104,178,.95);
+  animation:cursorFade var(--life,650ms) ease-out forwards;
+}
+
+@keyframes cursorFade {
+  from {
+    opacity:1;
+    transform:translate(-50%,-50%) scale(.85) rotate(0deg);
+  }
+  to {
+    opacity:0;
+    transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,-24px))) scale(.05) rotate(var(--spin,140deg));
+  }
+}
+
+@media (max-width:680px) {
+  .page {
+    width:min(100% - 18px,900px);
+    padding-top:18px;
+    padding-bottom:64px;
+  }
+
+  .lace {
+    width:108px;
+    height:110px;
+    opacity:.58;
+  }
+
+  .title-card {
+    margin-top:17px;
+    margin-bottom:38px;
+    padding:25px 18px 28px;
+    border-radius:28px;
+  }
+
+  .guide-grid { gap:26px; }
+
+  .guide-card {
+    padding:23px 18px;
+    border-radius:27px;
+  }
+
+  .charm {
+    right:-17px;
+    transform:scale(.78);
+  }
+
+  .ribbon {
+    width:74px;
+    height:25px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  html { scroll-behavior:auto; }
+  *,*::before,*::after {
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="lace left" aria-hidden="true"></div>
+<div class="lace right" aria-hidden="true"></div>
+<div class="floating-layer" id="floatingLayer" aria-hidden="true"></div>
+
+<main class="page">
+  <p class="name">Johann</p>
+
+  <header class="title-card">
+    <span class="ribbon left" aria-hidden="true"></span>
+    <span class="ribbon right" aria-hidden="true"></span>
+    <h1>Style Guide</h1>
+    <p>A bubblegum scrapbook diary system for a playful, dreamy, handcrafted web presence.</p>
+  </header>
+
+  <div class="guide-grid">
+    <section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>Site 1: Sanrio</h2>
+<p class="lead">What I like about it:</p>
+<ul>
+<li>pastel colour palette</li>
+<li>cute decorative graphics in motion</li>
+<li>playful atmosphere</li>
+<li>rounded shapes with contrast edges</li>
+</ul>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>Site 2: Mean Girls</h2>
+<p class="lead">What I like about it:</p>
+<ul>
+<li>scrapbook aesthetic</li>
+<li>layered imagery</li>
+<li>strong visual personality</li>
+<li>decorative composition</li>
+</ul>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>TYPOGRAPHY</h2>
+<p class="spec">Heading font: Parisienne</p>
+<p class="spec">Body font: Cormorant Garamond</p>
+<p class="spec">Headings are: medium</p>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>COLOUR</h2>
+<p class="spec"><span class="swatch bg"></span>Background: #F3B3D5</p>
+<p class="spec"><span class="swatch text"></span>Text: #8C2D65</p>
+<p class="spec"><span class="swatch accent"></span>Accent: #FF68B2</p>
+<p class="lead">The accent colour is used for:</p>
+<ul>
+<li>links</li>
+<li>borders</li>
+<li>buttons</li>
+<li>decorative graphics</li>
+<li>sparkles</li>
+</ul>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>LAYOUT</h2>
+<p class="spec">Columns on a laptop: 1 centered column</p>
+<p class="spec">Columns on a phone: 1 centered column</p>
+<p class="spec">The hero image runs: full width across the top</p>
+<p class="lead">Images should be:</p>
+<ul>
+<li>soft and dreamy</li>
+<li>pastel pink dominant</li>
+<li>scrapbook-inspired</li>
+<li>high resolution</li>
+<li>whimsical rather than realistic</li>
+</ul>
+<p class="lead">Images may contain:</p>
+<ul>
+<li>ribbons</li>
+<li>glitter</li>
+<li>clouds</li>
+<li>stickers</li>
+<li>collage elements</li>
+</ul>
+<p class="lead">Avoid:</p>
+<ul>
+<li>dark photography</li>
+<li>heavy shadows</li>
+<li>corporate stock photos</li>
+<li>generic AI imagery</li>
+</ul>
+<p class="spec">My name sits: at the top of the page above all content, only the first letter is capitalized</p>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>LINKS IN MY WORK LIST</h2>
+<p class="spec">They are: filled buttons with gradient</p>
+<p class="spec">Corners: fully rounded pill shape</p>
+<p class="spec">On hover: lift upward slightly and glow</p>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>MOVING BACKGROUND</h2>
+<p class="spec">What it is: floating glitter, sparkles, stickers and decorative elements</p>
+<p class="spec">Speed: medium</p>
+<p class="spec">Motion should be continuous and gentle.</p>
+<p class="spec">Elements may float, twinkle, shimmer, drift, or pulse. Motion should feel dreamy rather than chaotic.</p>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>DECORATIVE ELEMENTS</h2>
+<p class="lead">Use:</p>
+<ul>
+<li>lace curtains at the top corners</li>
+<li>charm bracelets attached to the card edges</li>
+<li>scrapbook paper layers behind the content card</li>
+<li>glitter particles across the background</li>
+<li>hearts, bows and sparkles around the perimeter</li>
+</ul>
+<p class="spec">Decorative graphics should occupy approximately 10-20% of the screen and should not obstruct text.</p>
+<p class="lead">Avoid:</p>
+<ul>
+<li>dark colours</li>
+<li>minimalism</li>
+<li>sharp corners</li>
+<li>corporate design</li>
+<li>monochrome layouts</li>
+</ul>
+</section>
+<section class="guide-card"><div class="pin" aria-hidden="true"></div><h2>GENERAL FEEL</h2>
+<p class="lead">The page should feel like:</p>
+<ul>
+<li>bubblegum</li>
+<li>kawaii</li>
+<li>scrapbook diary</li>
+<li>dreamy</li>
+<li>playful</li>
+<li>feminine</li>
+<li>handcrafted</li>
+</ul>
+<p class="spec">The design should remain readable and organized. Decorations should frame content rather than overwhelm it.</p>
+</section>
+  </div>
+
+  <div class="charm" aria-hidden="true"><span>♡</span></div>
+
+  <div class="demo-links" aria-label="Style examples">
+    <a class="demo-link" href="#top" onclick="return false;"><span>Example gradient pill button</span><span>✦</span></a>
+  </div>
+
+  <p class="footer">bubblegum · kawaii · scrapbook diary · dreamy ✦</p>
+</main>
+
+<script>
+(() => {
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const layer = document.getElementById("floatingLayer");
+
+  if (!reduceMotion) {
+    const symbols = ["✦","✧","♡","୨୧"];
+    for (let i = 0; i < 30; i++) {
+      const el = document.createElement("span");
+      const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+      el.className = "floaty" + (symbol === "♡" ? " heart" : "") + (symbol === "୨୧" ? " bow" : "");
+      el.textContent = symbol;
+      el.style.left = (Math.random() * 100) + "%";
+      el.style.top = (Math.random() * 100) + "%";
+      el.style.fontSize = (12 + Math.random() * 20) + "px";
+      el.style.setProperty("--speed", (8 + Math.random() * 7) + "s");
+      el.style.setProperty("--dx", ((Math.random() - .5) * 50) + "px");
+      el.style.setProperty("--dy", (-16 - Math.random() * 42) + "px");
+      el.style.animationDelay = (-Math.random() * 8) + "s";
+      layer.appendChild(el);
+    }
+
+    let lastX = 0, lastY = 0, lastTime = 0;
+    window.addEventListener("pointermove", e => {
+      if (e.pointerType === "touch") return;
+      const now = performance.now();
+      if (now - lastTime < 30 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 8) return;
+      lastTime = now; lastX = e.clientX; lastY = e.clientY;
+
+      const s = document.createElement("span");
+      s.className = "cursor-spark";
+      s.textContent = Math.random() > .5 ? "✦" : "✧";
+      const size = 7 + Math.random() * 7;
+      const life = 520 + Math.random() * 300;
+      s.style.left = (e.clientX + (Math.random() - .5) * 10) + "px";
+      s.style.top = (e.clientY + (Math.random() - .5) * 10) + "px";
+      s.style.setProperty("--size", size + "px");
+      s.style.setProperty("--life", life + "ms");
+      s.style.setProperty("--dx", ((Math.random() - .5) * 34) + "px");
+      s.style.setProperty("--dy", (-12 - Math.random() * 30) + "px");
+      s.style.setProperty("--spin", ((Math.random() - .5) * 280) + "deg");
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), life + 80);
+    }, {passive:true});
+  }
+})();
+</script>
+</body>
+</html>
