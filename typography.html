@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ghost Title-Page Poster Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "Baskervville Local";
+    src: url("./fonts/Baskervville/Baskervville-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Baskervville Local";
+    src: url("./fonts/Baskervville/Baskervville-Italic.ttf") format("truetype");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  :root {
+    color-scheme: dark;
+    --ui-bg: #171717;
+    --ui-panel: #202020;
+    --ui-line: #343434;
+    --ui-text: #f1f1ee;
+    --ui-muted: #a9a9a4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--ui-bg); color: var(--ui-text); }
+  body { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+  .app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(300px, 360px) 1fr;
+  }
+
+  .panel {
+    padding: 24px 20px 28px;
+    border-right: 1px solid var(--ui-line);
+    background: var(--ui-panel);
+    overflow: auto;
+    max-height: 100vh;
+  }
+
+  .eyebrow {
+    margin: 0 0 8px;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--ui-muted);
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .subhead {
+    margin: 0 0 24px;
+    color: var(--ui-muted);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0 0 22px;
+  }
+
+  legend {
+    padding: 0;
+    margin: 0 0 10px;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ui-muted);
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 11px;
+    font-size: 12px;
+    color: #d8d8d4;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    border: 1px solid #3c3c3c;
+    border-radius: 7px;
+    background: #181818;
+    color: var(--ui-text);
+    padding: 9px 10px;
+    font: inherit;
+    outline: none;
+  }
+
+  input[type="text"]:focus, select:focus { border-color: #6d6d6d; }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .color-grid label { margin: 0; }
+  input[type="color"] {
+    width: 100%; height: 36px; padding: 2px;
+    border: 1px solid #3c3c3c; border-radius: 7px; background: #181818;
+  }
+
+  .range-row {
+    display: grid;
+    grid-template-columns: 1fr 46px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 11px;
+  }
+
+  .range-row label { margin: 0; gap: 4px; }
+  input[type="range"] { width: 100%; accent-color: #b99da7; }
+  output { font-size: 11px; color: var(--ui-muted); text-align: right; }
+
+  .check-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #d8d8d4; }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  button {
+    border: 1px solid #454545;
+    border-radius: 8px;
+    background: #2b2b2b;
+    color: var(--ui-text);
+    padding: 10px 12px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  button:hover { background: #343434; }
+  button.primary { grid-column: 1 / -1; background: #eee9e5; color: #1d1d1d; border-color: #eee9e5; }
+  button.primary:hover { background: white; }
+
+  .stage {
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    padding: 34px;
+    background:
+      radial-gradient(circle at 50% 30%, #2a2a2a 0, #181818 68%);
+    overflow: auto;
+  }
+
+  .poster-shell {
+    width: min(68vw, 650px);
+    aspect-ratio: 1015 / 1500;
+    filter: drop-shadow(0 18px 38px rgba(0,0,0,.45));
+  }
+
+  #poster { display: block; width: 100%; height: 100%; }
+
+  .hint {
+    margin-top: 16px;
+    font-size: 11px;
+    color: #8e8e8a;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 850px) {
+    .app { grid-template-columns: 1fr; }
+    .panel { max-height: none; border-right: 0; border-bottom: 1px solid var(--ui-line); }
+    .stage { padding: 24px 12px 40px; }
+    .poster-shell { width: min(92vw, 620px); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="panel">
+    <p class="eyebrow">Typographic generator</p>
+    <h1>Ghost Title-Page</h1>
+    <p class="subhead">A constrained tool based on the selected archival pink poster. The interface lets content vary while protecting the original visual grammar.</p>
+
+    <fieldset>
+      <legend>Content</legend>
+      <label>Intro / italic accent <input id="intro" type="text" value="AN AFTERIMAGE"></label>
+      <label>Title line 1 <input id="title1" type="text" value="THE QUIET"></label>
+      <label>Title line 2 <input id="title2" type="text" value="ARCHIVE"></label>
+      <label>Title line 3 <input id="title3" type="text" value=""></label>
+      <label>Subtitle <input id="subtitle" type="text" value="NOTES ON MEMORY AND DISTANCE"></label>
+      <label>Attribution phrase <input id="attrib" type="text" value="ARRANGED BY"></label>
+      <label>Name / person <input id="person" type="text" value="JOHANN SETIAWAN"></label>
+      <label>Publisher <input id="publisher" type="text" value="AFTERIMAGE PRESS"></label>
+      <label>Location <input id="location" type="text" value="NEW YORK"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Typeface</legend>
+      <label>Family
+        <select id="fontFamily">
+          <option value="baskervville">Baskervville — primary</option>
+          <option value="cormorant">Cormorant Garamond — secondary</option>
+        </select>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Color</legend>
+      <div class="color-grid">
+        <label>Paper <input id="paper" type="color" value="#dbbcc6"></label>
+        <label>Frame <input id="frame" type="color" value="#c9a3ae"></label>
+        <label>Ink <input id="ink" type="color" value="#9d737f"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Structure</legend>
+      <div class="range-row">
+        <label>Type scale <input id="scale" type="range" min="85" max="125" value="100"></label><output id="scaleOut">100%</output>
+      </div>
+      <div class="range-row">
+        <label>Tracking <input id="tracking" type="range" min="70" max="145" value="100"></label><output id="trackingOut">100%</output>
+      </div>
+      <div class="range-row">
+        <label>Frame thickness <input id="frameSize" type="range" min="95" max="170" value="135"></label><output id="frameSizeOut">135</output>
+      </div>
+      <div class="range-row">
+        <label>Frame texture <input id="frameTexture" type="range" min="0" max="100" value="42"></label><output id="frameTextureOut">42</output>
+      </div>
+      <div class="range-row">
+        <label>Texture <input id="texture" type="range" min="0" max="100" value="38"></label><output id="textureOut">38</output>
+      </div>
+      <div class="range-row">
+        <label>Aging / specks <input id="aging" type="range" min="0" max="100" value="30"></label><output id="agingOut">30</output>
+      </div>
+      <label class="check-row"><input id="dividers" type="checkbox" checked> Show divider marks</label>
+    </fieldset>
+
+    <div class="buttons">
+      <button class="primary" id="variation">Generate restrained variation</button>
+      <button id="reset">Reset</button>
+      <button id="exportSvg">Export SVG</button>
+      <button id="printPdf">Print / Save PDF</button>
+    </div>
+
+    <p class="hint">SVG is the main handoff format. Install/download Baskervville locally before opening the export in Illustrator if you want exact font fidelity and editable text.</p>
+  </aside>
+
+  <main class="stage">
+    <div class="poster-shell">
+      <svg id="poster" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1015 1500" role="img" aria-label="Generated poster preview">
+        <defs>
+          <filter id="paperNoise" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence id="noiseTurbulence" type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"/>
+            <feColorMatrix type="saturate" values="0"/>
+          </filter>
+        </defs>
+        <g id="artwork"></g>
+      </svg>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const inputs = ["intro","title1","title2","title3","subtitle","attrib","person","publisher","location","fontFamily","paper","frame","ink","scale","tracking","frameSize","frameTexture","texture","aging","dividers"];
+  const defaults = {};
+  inputs.forEach(id => { const el = $(id); defaults[id] = el.type === "checkbox" ? el.checked : el.value; });
+
+  let layoutSeed = 17;
+  const artwork = $("artwork");
+
+  function svgEl(name, attrs = {}, text = "") {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+    if (text !== "") el.textContent = text;
+    return el;
+  }
+
+  function seededRandom(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s = (1664525 * s + 1013904223) >>> 0;
+      return s / 4294967296;
+    };
+  }
+
+  function familyName() {
+    return $("fontFamily").value === "cormorant"
+      ? "'Cormorant Garamond', Georgia, serif"
+      : "'Baskervville Local', 'Baskervville', Georgia, serif";
+  }
+
+  function textNode(text, y, size, trackingEm, italic = false, opacity = .86, extra = {}) {
+    if (!text.trim()) return null;
+    const attrs = {
+      x: 507.5,
+      y,
+      "text-anchor": "middle",
+      "dominant-baseline": "middle",
+      "font-family": familyName(),
+      "font-size": size,
+      "font-style": italic ? "italic" : "normal",
+      "font-weight": "400",
+      "letter-spacing": `${trackingEm}em`,
+      fill: $("ink").value,
+      opacity,
+      ...extra
+    };
+    const t = svgEl("text", attrs, text);
+    artwork.appendChild(t);
+
+    // A faint offset impression remains vector text and mimics uneven historical printing.
+    const impression = svgEl("text", {
+      ...attrs,
+      x: 508.15,
+      y: y + 0.8,
+      opacity: Math.max(.055, opacity * .10)
+    }, text);
+    artwork.insertBefore(impression, t);
+    return t;
+  }
+
+  function addPaperTexture(amount, centralX, centralY, centralW, centralH) {
+    // Stronger than before: visible fibres, soft blotches and tonal drift concentrated on the inner sheet.
+    if (amount <= 0) return;
+    const rnd = seededRandom(layoutSeed + 701);
+    const g = svgEl("g", {"aria-label":"paper texture"});
+    const ink = $("ink").value;
+    const density = Math.round(80 + Math.pow(amount, 1.28) * 980);
+
+    for (let i=0; i<density; i++) {
+      const x = centralX + rnd() * centralW;
+      const y = centralY + rnd() * centralH;
+      const dark = rnd() > .24;
+      const op = (0.03 + amount * (0.06 + rnd() * 0.18)) * (dark ? 1 : .78);
+
+      if (rnd() < .64) {
+        const len = 2.2 + rnd() * (6 + amount * 28);
+        const vertical = rnd() < .22;
+        g.appendChild(svgEl("line", {
+          x1:x.toFixed(2), y1:y.toFixed(2),
+          x2:(x + (vertical ? (rnd()-.5)*3.2 : len)).toFixed(2),
+          y2:(y + (vertical ? len : (rnd()-.5)*2.8)).toFixed(2),
+          stroke: dark ? ink : "#ffffff",
+          "stroke-width":(0.35 + rnd()*1.25).toFixed(2),
+          "stroke-linecap":"round",
+          opacity:op.toFixed(3)
+        }));
+      } else if (rnd() < .92) {
+        g.appendChild(svgEl("ellipse", {
+          cx:x.toFixed(2), cy:y.toFixed(2),
+          rx:(0.25 + rnd()*1.9 + amount*1.2).toFixed(2),
+          ry:(0.18 + rnd()*1.1 + amount*0.6).toFixed(2),
+          fill: dark ? ink : "#ffffff",
+          opacity:op.toFixed(3)
+        }));
+      } else {
+        g.appendChild(svgEl("path", {
+          d:`M ${x.toFixed(2)} ${y.toFixed(2)} q ${(rnd()*8-4).toFixed(2)} ${(rnd()*5-2.5).toFixed(2)} ${(rnd()*15-7.5).toFixed(2)} ${(rnd()*10-5).toFixed(2)}`,
+          fill:"none",
+          stroke: dark ? ink : "#ffffff",
+          "stroke-width":(0.4 + rnd()*1.1).toFixed(2),
+          opacity:(op*0.8).toFixed(3),
+          "stroke-linecap":"round"
+        }));
+      }
+    }
+
+    // Broader clouding so high values feel materially different.
+    const patches = Math.round(10 + amount * 34);
+    for (let i=0; i<patches; i++) {
+      g.appendChild(svgEl("ellipse", {
+        cx:(centralX + rnd()*centralW).toFixed(2), cy:(centralY + rnd()*centralH).toFixed(2),
+        rx:(24 + rnd()*120 + amount*35).toFixed(2), ry:(10 + rnd()*52 + amount*16).toFixed(2),
+        fill:rnd()>.45 ? ink : "#ffffff",
+        opacity:(0.014 + amount*(0.018 + rnd()*0.05)).toFixed(3)
+      }));
+    }
+
+    // Very soft perimeter rub inside the paper field.
+    for (let i=0; i<16; i++) {
+      const alongVertical = rnd() < .5;
+      const x = alongVertical ? (rnd() < .5 ? centralX + rnd()*10 : centralX + centralW - rnd()*10) : centralX + rnd()*centralW;
+      const y = alongVertical ? centralY + rnd()*centralH : (rnd() < .5 ? centralY + rnd()*10 : centralY + centralH - rnd()*10);
+      g.appendChild(svgEl("ellipse", {
+        cx:x.toFixed(2), cy:y.toFixed(2),
+        rx:(28 + rnd()*60 + amount*24).toFixed(2), ry:(8 + rnd()*22 + amount*12).toFixed(2),
+        fill: ink,
+        opacity:(0.01 + amount*(0.012 + rnd()*0.028)).toFixed(3)
+      }));
+    }
+    artwork.appendChild(g);
+  }
+
+  function addFrameTexture(amount, centralX, centralY, centralW, centralH) {
+    // Separate control for the darker border: worn paperboard, rougher than the inner sheet.
+    if (amount <= 0) return;
+    const rnd = seededRandom(layoutSeed + 1701);
+    const g = svgEl("g", {"aria-label":"frame texture"});
+    const ink = $("ink").value;
+    const count = Math.round(95 + Math.pow(amount, 1.22) * 900);
+    const insidePaper = (x, y) => x >= centralX && x <= centralX + centralW && y >= centralY && y <= centralY + centralH;
+
+    for (let i=0; i<count; i++) {
+      let x, y;
+      do {
+        x = rnd() * 1015;
+        y = rnd() * 1500;
+      } while (insidePaper(x, y));
+
+      const dark = rnd() > .18;
+      const kind = rnd();
+      const op = 0.026 + amount * (0.05 + rnd() * 0.16);
+      if (kind < .55) {
+        const len = 3 + rnd() * (8 + amount * 24);
+        const biasVertical = x < centralX || x > centralX + centralW;
+        g.appendChild(svgEl("line", {
+          x1:x.toFixed(2), y1:y.toFixed(2),
+          x2:(x + (biasVertical ? (rnd()-.5)*3.5 : len)).toFixed(2),
+          y2:(y + (biasVertical ? len : (rnd()-.5)*3.5)).toFixed(2),
+          stroke: dark ? ink : "#ffffff",
+          "stroke-width":(0.45 + rnd()*1.5).toFixed(2),
+          "stroke-linecap":"round",
+          opacity:op.toFixed(3)
+        }));
+      } else if (kind < .88) {
+        g.appendChild(svgEl("ellipse", {
+          cx:x.toFixed(2), cy:y.toFixed(2),
+          rx:(0.3 + rnd()*2.6 + amount*1.3).toFixed(2),
+          ry:(0.18 + rnd()*1.3 + amount*0.8).toFixed(2),
+          fill: dark ? ink : "#ffffff",
+          opacity:op.toFixed(3)
+        }));
+      } else {
+        g.appendChild(svgEl("path", {
+          d:`M ${x.toFixed(2)} ${y.toFixed(2)} q ${(rnd()*10-5).toFixed(2)} ${(rnd()*8-4).toFixed(2)} ${(rnd()*20-10).toFixed(2)} ${(rnd()*14-7).toFixed(2)}`,
+          fill:"none",
+          stroke: dark ? ink : "#ffffff",
+          "stroke-width":(0.5 + rnd()*1.6).toFixed(2),
+          opacity:(op*0.92).toFixed(3),
+          "stroke-linecap":"round"
+        }));
+      }
+    }
+
+    // Edge wear and board-like mottling, stronger near the inside opening and outer perimeter.
+    const scuffs = Math.round(12 + amount * 24);
+    for (let i=0; i<scuffs; i++) {
+      const nearInner = rnd() < .62;
+      const side = Math.floor(rnd()*4);
+      let cx, cy, rx, ry;
+      if (side === 0) { // top
+        cx = rnd()*1015;
+        cy = nearInner ? centralY - rnd()*18 : rnd()*28;
+        rx = 24 + rnd()*90 + amount*44;
+        ry = 6 + rnd()*18 + amount*10;
+      } else if (side === 1) { // bottom
+        cx = rnd()*1015;
+        cy = nearInner ? (centralY + centralH + rnd()*18) : (1500 - rnd()*28);
+        rx = 24 + rnd()*90 + amount*44;
+        ry = 6 + rnd()*18 + amount*10;
+      } else if (side === 2) { // left
+        cx = nearInner ? centralX - rnd()*18 : rnd()*28;
+        cy = rnd()*1500;
+        rx = 8 + rnd()*24 + amount*12;
+        ry = 22 + rnd()*84 + amount*40;
+      } else { // right
+        cx = nearInner ? (centralX + centralW + rnd()*18) : (1015 - rnd()*28);
+        cy = rnd()*1500;
+        rx = 8 + rnd()*24 + amount*12;
+        ry = 22 + rnd()*84 + amount*40;
+      }
+      g.appendChild(svgEl("ellipse", {
+        cx:cx.toFixed(2), cy:cy.toFixed(2), rx:rx.toFixed(2), ry:ry.toFixed(2),
+        fill: rnd() > .55 ? ink : "#ffffff",
+        opacity:(0.015 + amount*(0.02 + rnd()*0.045)).toFixed(3)
+      }));
+    }
+    artwork.appendChild(g);
+  }
+
+  function addAging(amount, centralX, centralY, centralW, centralH) {
+    // Stronger, clearly visible aging: pinholes, freckles, scratches and occasional larger foxing spots.
+    if (amount <= 0) return;
+    const rnd = seededRandom(layoutSeed + Math.round(amount * 1000) * 31 + 991);
+    const g = svgEl("g", {"aria-label":"aging marks and specks"});
+    const ink = $("ink").value;
+    const count = Math.round(38 + Math.pow(amount, 1.25) * 620);
+
+    for (let i=0; i<count; i++) {
+      const edgeBias = rnd() < (0.26 + amount*0.18);
+      const x = edgeBias
+        ? centralX + (rnd() < .5 ? rnd()*centralW : (rnd() < .5 ? rnd()*30 : centralW - rnd()*30))
+        : centralX + rnd() * centralW;
+      const y = edgeBias
+        ? centralY + (rnd() < .5 ? rnd()*centralH : (rnd() < .5 ? rnd()*34 : centralH - rnd()*34))
+        : centralY + rnd() * centralH;
+      const kind = rnd();
+
+      if (kind < .68) {
+        const r = 0.45 + Math.pow(rnd(), 2.0) * (3.2 + amount * 5.8);
+        const op = 0.055 + amount * (0.09 + rnd() * 0.24);
+        g.appendChild(svgEl("circle", {
+          cx:x.toFixed(2), cy:y.toFixed(2), r:r.toFixed(2),
+          fill:ink, opacity:op.toFixed(3)
+        }));
+      } else if (kind < .88) {
+        const len = 3 + rnd() * (7 + amount * 22);
+        const op = 0.05 + amount * (0.06 + rnd() * 0.16);
+        g.appendChild(svgEl("line", {
+          x1:x.toFixed(2), y1:y.toFixed(2),
+          x2:(x + len).toFixed(2), y2:(y + (rnd()-.5)*3.2).toFixed(2),
+          stroke:ink, "stroke-width":(0.5 + rnd()*1.35).toFixed(2),
+          "stroke-linecap":"round", opacity:op.toFixed(3)
+        }));
+      } else if (kind < .96) {
+        const rx = 4 + rnd() * (8 + amount * 18);
+        const ry = rx * (.35 + rnd()*.9);
+        g.appendChild(svgEl("ellipse", {
+          cx:x.toFixed(2), cy:y.toFixed(2), rx:rx.toFixed(2), ry:ry.toFixed(2),
+          fill:ink, opacity:(0.035 + amount*(0.04 + rnd()*0.11)).toFixed(3)
+        }));
+      } else {
+        g.appendChild(svgEl("path", {
+          d:`M ${x.toFixed(2)} ${y.toFixed(2)} q ${(rnd()*7-3.5).toFixed(2)} ${(rnd()*6-3).toFixed(2)} ${(rnd()*18-9).toFixed(2)} ${(rnd()*10-5).toFixed(2)}`,
+          fill:"none",
+          stroke:ink,
+          "stroke-width":(0.6 + rnd()*1.25).toFixed(2),
+          opacity:(0.04 + amount*(0.04 + rnd()*0.10)).toFixed(3),
+          "stroke-linecap":"round"
+        }));
+      }
+    }
+    artwork.appendChild(g);
+  }
+
+  function fitText(el, maxWidth, minSize) {
+    if (!el || !el.getComputedTextLength) return;
+    let size = parseFloat(el.getAttribute("font-size"));
+    while (el.getComputedTextLength() > maxWidth && size > minSize) {
+      size -= 0.6;
+      el.setAttribute("font-size", size.toFixed(2));
+    }
+  }
+
+  function render() {
+    artwork.innerHTML = "";
+    $("scaleOut").value = `${$("scale").value}%`;
+    $("trackingOut").value = `${$("tracking").value}%`;
+    $("frameSizeOut").value = $("frameSize").value;
+    $("frameTextureOut").value = $("frameTexture").value;
+    $("textureOut").value = $("texture").value;
+    $("agingOut").value = $("aging").value;
+
+    const frameSize = Number($("frameSize").value);
+    const scale = Number($("scale").value) / 100;
+    const track = Number($("tracking").value) / 100;
+    const frameTexture = Number($("frameTexture").value) / 100;
+    const texture = Number($("texture").value) / 100;
+    const aging = Number($("aging").value) / 100;
+    const cx = frameSize;
+    const cy = frameSize * 1.06;
+    const cw = 1015 - frameSize * 2;
+    const ch = 1500 - cy - frameSize * .98;
+
+    // Base frame and central paper field.
+    artwork.appendChild(svgEl("rect", {x:0, y:0, width:1015, height:1500, fill:$("frame").value}));
+    artwork.appendChild(svgEl("rect", {x:cx, y:cy, width:cw, height:ch, fill:$("paper").value}));
+
+    // Slightly imperfect seams: broad, extremely low-contrast vector strips.
+    const seamOpacity = 0.03 + texture * 0.06 + frameTexture * 0.05;
+    artwork.appendChild(svgEl("rect", {x:cx-2, y:cy, width:3.5, height:ch, fill:$("ink").value, opacity:seamOpacity}));
+    artwork.appendChild(svgEl("rect", {x:cx+cw-1.2, y:cy, width:2.4, height:ch, fill:$("ink").value, opacity:seamOpacity*.85}));
+    artwork.appendChild(svgEl("rect", {x:cx, y:cy-1.5, width:cw, height:2.7, fill:$("ink").value, opacity:seamOpacity*.65}));
+
+    // SVG turbulence gives the sheet a continuous fine grain. Now stronger so the slider has a clear visual payoff.
+    if (texture > 0) {
+      const noise = svgEl("rect", {
+        x:cx, y:cy, width:cw, height:ch,
+        fill:"#ffffff", filter:"url(#paperNoise)",
+        opacity:(0.045 + Math.pow(texture, 1.2) * 0.42).toFixed(3),
+        "style":"mix-blend-mode:multiply"
+      });
+      artwork.appendChild(noise);
+      $("noiseTurbulence").setAttribute("seed", String(layoutSeed % 97 + 1));
+      $("noiseTurbulence").setAttribute("baseFrequency", (0.32 + texture * 0.46).toFixed(3));
+    }
+
+    if (frameTexture > 0) {
+      const frameNoise = svgEl("path", {
+        d:`M 0 0 H 1015 V 1500 H 0 Z M ${cx} ${cy} H ${cx+cw} V ${cy+ch} H ${cx} Z`,
+        fill:"#ffffff",
+        filter:"url(#paperNoise)",
+        opacity:(0.03 + Math.pow(frameTexture, 1.15) * 0.34).toFixed(3),
+        "fill-rule":"evenodd",
+        "clip-rule":"evenodd",
+        "style":"mix-blend-mode:multiply"
+      });
+      artwork.appendChild(frameNoise);
+    }
+
+    addFrameTexture(frameTexture, cx, cy, cw, ch);
+
+    // Add editable vector fibres on top of the continuous grain.
+    addPaperTexture(texture, cx, cy, cw, ch);
+
+    // Type sizes derived from T ≈ 16 px on the 1500px canvas, then scaled for the browser preview.
+    const T = 16.2 * scale;
+    const title1Size = 2.0 * T;
+    const title2Size = 1.82 * T;
+    const title3Size = 1.64 * T;
+    const introSize = 1.40 * T;
+    const subSize = 1.34 * T;
+    const metaSize = 1.10 * T;
+    const personSize = 1.20 * T;
+    const pubSize = 1.02 * T;
+
+    const rnd = seededRandom(layoutSeed);
+    const microY = () => (rnd() - .5) * 4;
+    const upperShift = (rnd() - .5) * 18;
+    const lowerShift = (rnd() - .5) * 14;
+
+    const nodes = [];
+    nodes.push([textNode($("intro").value, 345 + upperShift + microY(), introSize, .11*track, true, .80), cw*.77, 15]);
+    nodes.push([textNode($("title1").value.toUpperCase(), 418 + upperShift + microY(), title1Size, .13*track, false, .86), cw*.80, 18]);
+    nodes.push([textNode($("title2").value.toUpperCase(), 483 + upperShift + microY(), title2Size, .14*track, false, .86), cw*.80, 17]);
+    nodes.push([textNode($("title3").value.toUpperCase(), 540 + upperShift + microY(), title3Size, .15*track, false, .84), cw*.80, 16]);
+    nodes.push([textNode($("subtitle").value.toUpperCase(), 580 + upperShift + microY() + ($("title3").value.trim()?35:0), subSize, .19*track, false, .82), cw*.86, 14]);
+
+    const dividerY1 = 660 + upperShift + ($("title3").value.trim()?25:0);
+    if ($("dividers").checked) {
+      artwork.appendChild(svgEl("rect", {x:495.5, y:dividerY1, width:24, height:4.5, rx:0.7, fill:$("ink").value, opacity:.65}));
+    }
+
+    nodes.push([textNode($("attrib").value.toUpperCase(), 720 + upperShift + microY() + ($("title3").value.trim()?20:0), metaSize, .22*track, false, .79), cw*.75, 13]);
+    nodes.push([textNode($("person").value.toUpperCase(), 785 + upperShift + microY() + ($("title3").value.trim()?20:0), personSize, .20*track, false, .83), cw*.82, 14]);
+
+    if ($("dividers").checked) {
+      artwork.appendChild(svgEl("rect", {x:496.5, y:852 + upperShift + ($("title3").value.trim()?18:0), width:22, height:4.2, rx:0.7, fill:$("ink").value, opacity:.60}));
+    }
+
+    nodes.push([textNode($("publisher").value.toUpperCase(), 1200 + lowerShift + microY(), pubSize, .22*track, false, .77), cw*.72, 12]);
+    nodes.push([textNode($("location").value.toUpperCase(), 1260 + lowerShift + microY(), pubSize*.92, .25*track, false, .78), cw*.60, 11]);
+
+    // Aging is a separate layer from texture: distinct marks should become clearly visible as the slider rises.
+    addAging(aging, cx, cy, cw, ch);
+
+    // Fit long lines while preserving hierarchy and generous margins.
+    requestAnimationFrame(() => {
+      nodes.forEach(([el, max, min]) => fitText(el, max, min));
+    });
+  }
+
+  function vary() {
+    layoutSeed = Math.floor(Math.random() * 100000) + 1;
+    const clamp = (v,min,max) => Math.min(max, Math.max(min, v));
+    $("scale").value = clamp(100 + Math.round((Math.random()-.5)*16), 90, 112);
+    $("tracking").value = clamp(100 + Math.round((Math.random()-.5)*24), 88, 118);
+    $("frameSize").value = clamp(135 + Math.round((Math.random()-.5)*24), 118, 152);
+    $("frameTexture").value = clamp(42 + Math.round((Math.random()-.5)*26), 22, 74);
+    $("texture").value = clamp(38 + Math.round((Math.random()-.5)*28), 20, 68);
+    $("aging").value = clamp(30 + Math.round((Math.random()-.5)*30), 14, 62);
+    render();
+  }
+
+  function reset() {
+    inputs.forEach(id => {
+      const el = $(id);
+      if (el.type === "checkbox") el.checked = defaults[id]; else el.value = defaults[id];
+    });
+    layoutSeed = 17;
+    render();
+  }
+
+  function exportSVG() {
+    const svg = $("poster").cloneNode(true);
+    svg.setAttribute("width", "1015");
+    svg.setAttribute("height", "1500");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    const meta = document.createComment("Generated with Ghost Title-Page Poster Generator. Install Baskervville or Cormorant Garamond locally for exact editable typography in Illustrator.");
+    svg.insertBefore(meta, svg.firstChild);
+    const data = `<?xml version="1.0" encoding="UTF-8"?>\n${new XMLSerializer().serializeToString(svg)}`;
+    const blob = new Blob([data], {type:"image/svg+xml;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ghost-title-page-poster.svg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function printPoster() {
+    const svg = new XMLSerializer().serializeToString($("poster"));
+    const w = window.open("", "poster-print", "width=900,height=1100");
+    if (!w) { alert("Please allow pop-ups for the print/PDF window."); return; }
+    w.document.write(`<!doctype html><html><head><title>Poster Print</title><style>@page{size:portrait;margin:0}html,body{margin:0;background:white}body{display:grid;place-items:center;min-height:100vh}svg{width:100vw;height:100vh;object-fit:contain}</style></head><body>${svg}<script>window.onload=()=>setTimeout(()=>window.print(),250)<\/script></body></html>`);
+    w.document.close();
+  }
+
+  inputs.forEach(id => {
+    const el = $(id);
+    el.addEventListener(el.type === "text" ? "input" : "change", render);
+    if (el.type === "range" || el.type === "color") el.addEventListener("input", render);
+  });
+  $("variation").addEventListener("click", vary);
+  $("reset").addEventListener("click", reset);
+  $("exportSvg").addEventListener("click", exportSVG);
+  $("printPdf").addEventListener("click", printPoster);
+
+  render();
+})();
+</script>
+</body>
+</html>
