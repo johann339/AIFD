@@ -108,16 +108,41 @@
 
   input[type="text"]:focus, select:focus { border-color: #6d6d6d; }
 
-  .color-grid {
+  .palette-control {
+    display: grid;
+    grid-template-columns: 1fr 92px;
+    gap: 10px;
+    align-items: end;
+  }
+  .palette-control label { margin: 0; }
+  input[type="color"] {
+    width: 100%; height: 38px; padding: 2px;
+    border: 1px solid #3c3c3c; border-radius: 7px; background: #181818;
+  }
+  .palette-note {
+    margin: 8px 0 10px;
+    font-size: 10px;
+    line-height: 1.45;
+    color: var(--ui-muted);
+  }
+  .palette-swatches {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
   }
-
-  .color-grid label { margin: 0; }
-  input[type="color"] {
-    width: 100%; height: 36px; padding: 2px;
-    border: 1px solid #3c3c3c; border-radius: 7px; background: #181818;
+  .palette-swatch {
+    display: grid;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--ui-muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .palette-chip {
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #3c3c3c;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
   }
 
   .range-row {
@@ -218,11 +243,20 @@
 
     <fieldset>
       <legend>Color</legend>
-      <div class="color-grid">
-        <label>Paper <input id="paper" type="color" value="#dbbcc6"></label>
-        <label>Frame <input id="frame" type="color" value="#c9a3ae"></label>
-        <label>Ink <input id="ink" type="color" value="#9d737f"></label>
+      <div class="palette-control">
+        <label>Palette color
+          <input id="palette" type="color" value="#c9a3ae" aria-label="Choose palette hue">
+        </label>
       </div>
+      <p class="palette-note">Choose a hue only. Paper, frame, and ink are automatically muted and tone-matched to preserve the original poster's color relationship.</p>
+      <div class="palette-swatches" aria-label="Generated palette preview">
+        <div class="palette-swatch">Paper <span class="palette-chip" id="paperSwatch"></span></div>
+        <div class="palette-swatch">Frame <span class="palette-chip" id="frameSwatch"></span></div>
+        <div class="palette-swatch">Ink <span class="palette-chip" id="inkSwatch"></span></div>
+      </div>
+      <input id="paper" type="hidden" value="#dbbcc6">
+      <input id="frame" type="hidden" value="#c9a3ae">
+      <input id="ink" type="hidden" value="#9d737f">
     </fieldset>
 
     <fieldset>
@@ -276,7 +310,7 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const inputs = ["intro","title1","title2","title3","subtitle","attrib","person","publisher","location","fontFamily","paper","frame","ink","scale","tracking","frameSize","frameTexture","texture","aging","dividers"];
+  const inputs = ["intro","title1","title2","title3","subtitle","attrib","person","publisher","location","fontFamily","palette","scale","tracking","frameSize","frameTexture","texture","aging","dividers"];
   const defaults = {};
   inputs.forEach(id => { const el = $(id); defaults[id] = el.type === "checkbox" ? el.checked : el.value; });
 
@@ -296,6 +330,63 @@
       s = (1664525 * s + 1013904223) >>> 0;
       return s / 4294967296;
     };
+  }
+
+  function hexToHsl(hex) {
+    const raw = hex.replace("#", "");
+    const r = parseInt(raw.slice(0,2),16) / 255;
+    const g = parseInt(raw.slice(2,4),16) / 255;
+    const b = parseInt(raw.slice(4,6),16) / 255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+    const d = max - min;
+    if (d !== 0) {
+      s = d / (1 - Math.abs(2*l - 1));
+      switch (max) {
+        case r: h = 60 * (((g-b)/d) % 6); break;
+        case g: h = 60 * (((b-r)/d) + 2); break;
+        case b: h = 60 * (((r-g)/d) + 4); break;
+      }
+    }
+    if (h < 0) h += 360;
+    return {h, s:s*100, l:l*100};
+  }
+
+  function hslToHex(h, s, l) {
+    h = ((h % 360) + 360) % 360;
+    s /= 100; l /= 100;
+    const c = (1 - Math.abs(2*l - 1)) * s;
+    const x = c * (1 - Math.abs((h/60)%2 - 1));
+    const m = l - c/2;
+    let r=0,g=0,b=0;
+    if (h < 60) [r,g,b] = [c,x,0];
+    else if (h < 120) [r,g,b] = [x,c,0];
+    else if (h < 180) [r,g,b] = [0,c,x];
+    else if (h < 240) [r,g,b] = [0,x,c];
+    else if (h < 300) [r,g,b] = [x,0,c];
+    else [r,g,b] = [c,0,x];
+    const toHex = v => Math.round((v+m)*255).toString(16).padStart(2,"0");
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  function calibratePalette() {
+    const source = hexToHsl($("palette").value);
+    const neutral = source.s < 3;
+    const h = source.h;
+
+    // These values reproduce the reference poster's relationship:
+    // light/desaturated paper, slightly darker frame, restrained low-saturation ink.
+    const paper = hslToHex(h - 2, neutral ? 0 : 30, 80);
+    const frame = hslToHex(h, neutral ? 0 : 26, 71.5);
+    const ink = hslToHex(h + 0.3, neutral ? 0 : 18, 53.3);
+
+    $("paper").value = paper;
+    $("frame").value = frame;
+    $("ink").value = ink;
+    $("paperSwatch").style.background = paper;
+    $("frameSwatch").style.background = frame;
+    $("inkSwatch").style.background = ink;
   }
 
   function familyName() {
@@ -559,6 +650,7 @@
 
   function render() {
     artwork.innerHTML = "";
+    calibratePalette();
     $("scaleOut").value = `${$("scale").value}%`;
     $("trackingOut").value = `${$("tracking").value}%`;
     $("frameSizeOut").value = $("frameSize").value;
