@@ -203,6 +203,16 @@
     line-height: 1.45;
   }
 
+  .variation-status {
+    grid-column: 1 / -1;
+    margin: 1px 2px 3px;
+    min-height: 14px;
+    font-size: 10px;
+    line-height: 1.35;
+    color: #8e8e8a;
+    letter-spacing: .035em;
+  }
+
   @media (max-width: 850px) {
     .app { grid-template-columns: 1fr; }
     .panel { max-height: none; border-right: 0; border-bottom: 1px solid var(--ui-line); }
@@ -284,6 +294,7 @@
 
     <div class="buttons">
       <button class="primary" id="variation">Generate restrained variation</button>
+      <p class="variation-status" id="variationStatus">Composition: Classical axis</p>
       <button id="reset">Reset</button>
       <button id="exportSvg">Export SVG</button>
       <button id="printPdf">Print / Save PDF</button>
@@ -315,6 +326,18 @@
   inputs.forEach(id => { const el = $(id); defaults[id] = el.type === "checkbox" ? el.checked : el.value; });
 
   let layoutSeed = 17;
+  let compositionMode = 0;
+  let extremeSummary = "";
+  const compositionNames = [
+    "Classical axis",
+    "High cluster",
+    "Low gravity",
+    "Split axis",
+    "Counterpoint",
+    "Expanded field",
+    "Compressed core",
+    "Offset bands"
+  ];
   const artwork = $("artwork");
 
   function svgEl(name, attrs = {}, text = "") {
@@ -417,7 +440,7 @@
     // A faint offset impression remains vector text and mimics uneven historical printing.
     const impression = svgEl("text", {
       ...attrs,
-      x: 508.15,
+      x: Number(attrs.x) + 0.65,
       y: y + 0.8,
       opacity: Math.max(.055, opacity * .10)
     }, text);
@@ -648,6 +671,83 @@
     }
   }
 
+  function compositionPlan(mode, cx, cy, cw, ch) {
+    const center = cx + cw / 2;
+    const xShift = (fraction) => center + cw * fraction;
+    const yAt = (fraction) => cy + ch * fraction;
+
+    const plans = [
+      // 0 — Reference-faithful central spine.
+      {
+        introX:center, titleX:center, subtitleX:center, metaX:center, footerX:center,
+        introY:.165, t1Y:.225, t2Y:.278, t3Y:.325, subtitleY:.372,
+        divider1Y:.437, attribY:.487, personY:.542, divider2Y:.598,
+        publisherY:.862, locationY:.910
+      },
+      // 1 — Concentrate information toward the top, leaving a deep field of quiet below.
+      {
+        introX:center, titleX:center, subtitleX:center, metaX:center, footerX:center,
+        introY:.105, t1Y:.160, t2Y:.208, t3Y:.252, subtitleY:.302,
+        divider1Y:.362, attribY:.405, personY:.452, divider2Y:.500,
+        publisherY:.875, locationY:.918
+      },
+      // 2 — Let the title settle lower on the sheet while preserving a ceremonial footer.
+      {
+        introX:center, titleX:center, subtitleX:center, metaX:center, footerX:center,
+        introY:.255, t1Y:.310, t2Y:.358, t3Y:.403, subtitleY:.450,
+        divider1Y:.505, attribY:.548, personY:.596, divider2Y:.642,
+        publisherY:.855, locationY:.905
+      },
+      // 3 — Two nearby vertical axes: title left of center, attribution right of center.
+      {
+        introX:xShift(-.052), titleX:xShift(-.052), subtitleX:xShift(-.052),
+        metaX:xShift(.060), footerX:center,
+        introY:.160, t1Y:.220, t2Y:.274, t3Y:.322, subtitleY:.372,
+        divider1Y:.440, attribY:.492, personY:.548, divider2Y:.605,
+        publisherY:.858, locationY:.908
+      },
+      // 4 — Subtle counterpoint: individual sections occupy neighboring axes.
+      {
+        introX:xShift(.050), titleX:center, subtitleX:xShift(-.055),
+        metaX:xShift(.045), footerX:xShift(-.035),
+        introY:.145, t1Y:.220, t2Y:.274, t3Y:.323, subtitleY:.392,
+        divider1Y:.458, attribY:.510, personY:.563, divider2Y:.620,
+        publisherY:.850, locationY:.903
+      },
+      // 5 — Spread the sections across more of the vertical field.
+      {
+        introX:center, titleX:center, subtitleX:center, metaX:center, footerX:center,
+        introY:.110, t1Y:.185, t2Y:.250, t3Y:.310, subtitleY:.372,
+        divider1Y:.455, attribY:.535, personY:.603, divider2Y:.675,
+        publisherY:.842, locationY:.910
+      },
+      // 6 — A dense central nucleus surrounded by exaggerated negative space.
+      {
+        introX:center, titleX:center, subtitleX:center, metaX:center, footerX:center,
+        introY:.245, t1Y:.292, t2Y:.334, t3Y:.373, subtitleY:.417,
+        divider1Y:.468, attribY:.510, personY:.551, divider2Y:.596,
+        publisherY:.875, locationY:.915
+      },
+      // 7 — Horizontal bands drift in opposite directions without ever rotating.
+      {
+        introX:xShift(-.035), titleX:xShift(.050), subtitleX:xShift(-.045),
+        metaX:xShift(-.055), footerX:xShift(.035),
+        introY:.155, t1Y:.220, t2Y:.275, t3Y:.326, subtitleY:.385,
+        divider1Y:.452, attribY:.510, personY:.565, divider2Y:.620,
+        publisherY:.855, locationY:.907
+      }
+    ];
+
+    const p = plans[mode] || plans[0];
+    return {
+      ...p,
+      introY:yAt(p.introY), t1Y:yAt(p.t1Y), t2Y:yAt(p.t2Y), t3Y:yAt(p.t3Y),
+      subtitleY:yAt(p.subtitleY), divider1Y:yAt(p.divider1Y), attribY:yAt(p.attribY),
+      personY:yAt(p.personY), divider2Y:yAt(p.divider2Y),
+      publisherY:yAt(p.publisherY), locationY:yAt(p.locationY)
+    };
+  }
+
   function render() {
     artwork.innerHTML = "";
     calibratePalette();
@@ -657,6 +757,7 @@
     $("frameTextureOut").value = $("frameTexture").value;
     $("textureOut").value = $("texture").value;
     $("agingOut").value = $("aging").value;
+    $("variationStatus").textContent = `Composition: ${compositionNames[compositionMode]}${extremeSummary ? ` · pushed: ${extremeSummary}` : ""}`;
 
     const frameSize = Number($("frameSize").value);
     const scale = Number($("scale").value) / 100;
@@ -722,31 +823,46 @@
     const pubSize = 1.02 * T;
 
     const rnd = seededRandom(layoutSeed);
-    const microY = () => (rnd() - .5) * 4;
-    const upperShift = (rnd() - .5) * 18;
-    const lowerShift = (rnd() - .5) * 14;
+    const microY = () => (rnd() - .5) * 4.5;
+    const plan = compositionPlan(compositionMode, cx, cy, cw, ch);
+    const hasTitle3 = $("title3").value.trim() !== "";
+
+    // Divider dimensions remain tiny and typographic, but vary enough to become part of the composition.
+    const divider1W = 15 + rnd() * 23;
+    const divider2W = 13 + rnd() * 21;
 
     const nodes = [];
-    nodes.push([textNode($("intro").value, 345 + upperShift + microY(), introSize, .11*track, true, .80), cw*.77, 15]);
-    nodes.push([textNode($("title1").value.toUpperCase(), 418 + upperShift + microY(), title1Size, .13*track, false, .86), cw*.80, 18]);
-    nodes.push([textNode($("title2").value.toUpperCase(), 483 + upperShift + microY(), title2Size, .14*track, false, .86), cw*.80, 17]);
-    nodes.push([textNode($("title3").value.toUpperCase(), 540 + upperShift + microY(), title3Size, .15*track, false, .84), cw*.80, 16]);
-    nodes.push([textNode($("subtitle").value.toUpperCase(), 580 + upperShift + microY() + ($("title3").value.trim()?35:0), subSize, .19*track, false, .82), cw*.86, 14]);
-
-    const dividerY1 = 660 + upperShift + ($("title3").value.trim()?25:0);
-    if ($("dividers").checked) {
-      artwork.appendChild(svgEl("rect", {x:495.5, y:dividerY1, width:24, height:4.5, rx:0.7, fill:$("ink").value, opacity:.65}));
+    nodes.push([textNode($("intro").value, plan.introY + microY(), introSize, .11*track, true, .80, {x:plan.introX}), cw*.72, 15]);
+    nodes.push([textNode($("title1").value.toUpperCase(), plan.t1Y + microY(), title1Size, .13*track, false, .86, {x:plan.titleX}), cw*.76, 18]);
+    nodes.push([textNode($("title2").value.toUpperCase(), plan.t2Y + microY(), title2Size, .14*track, false, .86, {x:plan.titleX}), cw*.76, 17]);
+    if (hasTitle3) {
+      nodes.push([textNode($("title3").value.toUpperCase(), plan.t3Y + microY(), title3Size, .15*track, false, .84, {x:plan.titleX}), cw*.76, 16]);
     }
-
-    nodes.push([textNode($("attrib").value.toUpperCase(), 720 + upperShift + microY() + ($("title3").value.trim()?20:0), metaSize, .22*track, false, .79), cw*.75, 13]);
-    nodes.push([textNode($("person").value.toUpperCase(), 785 + upperShift + microY() + ($("title3").value.trim()?20:0), personSize, .20*track, false, .83), cw*.82, 14]);
+    nodes.push([textNode($("subtitle").value.toUpperCase(), plan.subtitleY + (hasTitle3 ? ch*.025 : 0) + microY(), subSize, .19*track, false, .82, {x:plan.subtitleX}), cw*.82, 14]);
 
     if ($("dividers").checked) {
-      artwork.appendChild(svgEl("rect", {x:496.5, y:852 + upperShift + ($("title3").value.trim()?18:0), width:22, height:4.2, rx:0.7, fill:$("ink").value, opacity:.60}));
+      artwork.appendChild(svgEl("rect", {
+        x:plan.metaX-divider1W/2,
+        y:plan.divider1Y + (hasTitle3 ? ch*.012 : 0),
+        width:divider1W, height:4.5, rx:0.7,
+        fill:$("ink").value, opacity:.65
+      }));
     }
 
-    nodes.push([textNode($("publisher").value.toUpperCase(), 1200 + lowerShift + microY(), pubSize, .22*track, false, .77), cw*.72, 12]);
-    nodes.push([textNode($("location").value.toUpperCase(), 1260 + lowerShift + microY(), pubSize*.92, .25*track, false, .78), cw*.60, 11]);
+    nodes.push([textNode($("attrib").value.toUpperCase(), plan.attribY + (hasTitle3 ? ch*.010 : 0) + microY(), metaSize, .22*track, false, .79, {x:plan.metaX}), cw*.70, 13]);
+    nodes.push([textNode($("person").value.toUpperCase(), plan.personY + (hasTitle3 ? ch*.010 : 0) + microY(), personSize, .20*track, false, .83, {x:plan.metaX}), cw*.77, 14]);
+
+    if ($("dividers").checked) {
+      artwork.appendChild(svgEl("rect", {
+        x:plan.metaX-divider2W/2,
+        y:plan.divider2Y + (hasTitle3 ? ch*.009 : 0),
+        width:divider2W, height:4.2, rx:0.7,
+        fill:$("ink").value, opacity:.60
+      }));
+    }
+
+    nodes.push([textNode($("publisher").value.toUpperCase(), plan.publisherY + microY(), pubSize, .22*track, false, .77, {x:plan.footerX}), cw*.67, 12]);
+    nodes.push([textNode($("location").value.toUpperCase(), plan.locationY + microY(), pubSize*.92, .25*track, false, .78, {x:plan.footerX}), cw*.57, 11]);
 
     // Aging is a separate layer from texture: distinct marks should become clearly visible as the slider rises.
     addAging(aging, cx, cy, cw, ch);
@@ -759,13 +875,47 @@
 
   function vary() {
     layoutSeed = Math.floor(Math.random() * 100000) + 1;
-    const clamp = (v,min,max) => Math.min(max, Math.max(min, v));
-    $("scale").value = clamp(100 + Math.round((Math.random()-.5)*16), 90, 112);
-    $("tracking").value = clamp(100 + Math.round((Math.random()-.5)*24), 88, 118);
-    $("frameSize").value = clamp(135 + Math.round((Math.random()-.5)*24), 118, 152);
-    $("frameTexture").value = clamp(42 + Math.round((Math.random()-.5)*26), 22, 74);
-    $("texture").value = clamp(38 + Math.round((Math.random()-.5)*28), 20, 68);
-    $("aging").value = clamp(30 + Math.round((Math.random()-.5)*30), 14, 62);
+
+    // "Extreme within restraint": each generation deliberately pushes 2–4 structural
+    // controls close to one end of their *existing curated range* rather than keeping
+    // every control near its default. The remaining controls stay in the middle band.
+    const specs = [
+      {id:"scale", min:85, max:125, label:"scale"},
+      {id:"tracking", min:70, max:145, label:"tracking"},
+      {id:"frameSize", min:95, max:170, label:"frame"},
+      {id:"frameTexture", min:0, max:100, label:"frame texture"},
+      {id:"texture", min:0, max:100, label:"paper texture"},
+      {id:"aging", min:0, max:100, label:"aging"}
+    ];
+
+    const shuffled = [...specs].sort(() => Math.random() - .5);
+    const extremeCount = 2 + Math.floor(Math.random() * 3); // 2, 3 or 4
+    const extremeIds = new Set(shuffled.slice(0, extremeCount).map(s => s.id));
+    const pushed = [];
+
+    const sample = (spec, extreme) => {
+      const span = spec.max - spec.min;
+      if (extreme) {
+        const high = Math.random() < .5;
+        // Top/bottom 12% of the available slider range; occasional exact endpoint.
+        if (Math.random() < .18) return high ? spec.max : spec.min;
+        const edgeDepth = Math.random() * .12 * span;
+        return Math.round(high ? spec.max - edgeDepth : spec.min + edgeDepth);
+      }
+      // Middle 58% retains restraint while making the pushed dimensions legible.
+      return Math.round(spec.min + span * (.21 + Math.random() * .58));
+    };
+
+    specs.forEach(spec => {
+      const isExtreme = extremeIds.has(spec.id);
+      $(spec.id).value = sample(spec, isExtreme);
+      if (isExtreme) pushed.push(spec.label);
+    });
+
+    // Composition itself is now generative. Classical axis still appears occasionally,
+    // but most clicks explore another disciplined paper-relative grid.
+    compositionMode = Math.random() < .12 ? 0 : 1 + Math.floor(Math.random() * (compositionNames.length - 1));
+    extremeSummary = pushed.join(", ");
     render();
   }
 
@@ -775,6 +925,8 @@
       if (el.type === "checkbox") el.checked = defaults[id]; else el.value = defaults[id];
     });
     layoutSeed = 17;
+    compositionMode = 0;
+    extremeSummary = "";
     render();
   }
 
