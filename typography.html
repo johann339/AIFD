@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The Living Archive — Live Wikipedia Generator</title>
+<title>Ghost Title-Page Poster Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Fraunces:opsz,wght,SOFT,WONK@9..144,100..900,0..100,0..1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
   @font-face {
     font-family: "Baskervville Local";
@@ -188,47 +188,10 @@
     overflow: auto;
   }
 
-  .poster-stack {
-    position: relative;
+  .poster-shell {
     width: min(68vw, 650px);
     aspect-ratio: 1015 / 1500;
-  }
-
-  .history-stack {
-    position: absolute;
-    inset: -2.5% -3.5% -3.5% -3.5%;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .history-page {
-    position: absolute;
-    inset: 0;
-    transition: opacity .9s ease, transform .9s ease, filter .9s ease;
-    will-change: transform, opacity, filter;
-  }
-
-  .history-sheet {
-    width: 100%;
-    height: 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    filter: drop-shadow(0 14px 22px rgba(0,0,0,.18));
-  }
-
-  .poster-shell {
-    position: absolute;
-    inset: 0;
-    z-index: 4;
     filter: drop-shadow(0 18px 38px rgba(0,0,0,.45));
-    transition: transform .85s ease, opacity .85s ease, filter .85s ease;
-  }
-
-  .poster-shell.refreshing {
-    transform: translateY(7px) scale(.992);
-    opacity: .985;
-    filter: drop-shadow(0 10px 22px rgba(0,0,0,.38));
   }
 
   #poster { display: block; width: 100%; height: 100%; }
@@ -250,288 +213,32 @@
     letter-spacing: .035em;
   }
 
-
-  .live-card {
-    border: 1px solid #3a3a3a;
-    border-radius: 10px;
-    padding: 13px 13px 11px;
-    margin-bottom: 22px;
-    background: #1a1a1a;
-  }
-  .live-card legend { padding: 0 4px; }
-  .stream-line { display:flex; align-items:center; gap:8px; margin-bottom:11px; font-size:11px; color:#d8d8d4; }
-  .status-dot { width:8px; height:8px; border-radius:50%; background:#777; box-shadow:0 0 0 3px rgba(255,255,255,.03); flex:none; }
-  .status-dot.live { background:#9eb69e; box-shadow:0 0 0 3px rgba(158,182,158,.10); }
-  .status-dot.error { background:#b78484; box-shadow:0 0 0 3px rgba(183,132,132,.10); }
-  .data-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:0 0 11px; }
-  .metric { min-width:0; padding:8px; border:1px solid #303030; border-radius:7px; background:#171717; }
-  .metric span { display:block; margin-bottom:4px; color:#777; text-transform:uppercase; letter-spacing:.11em; font-size:8px; }
-  .metric strong { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#d8d8d4; font-size:10px; font-weight:500; }
-  .live-actions { display:flex; gap:7px; align-items:center; margin-top:9px; }
-  .live-actions button { padding:7px 9px; font-size:10px; }
-  .article-link { color:#aaa; font-size:10px; text-decoration:none; border-bottom:1px solid #555; }
-  .article-link:hover { color:#eee; }
-  .mapping-note { margin:10px 0 0; color:#777; font-size:9px; line-height:1.45; }
-
-  .revision-lens { margin-top:12px; padding-top:11px; border-top:1px solid #303030; }
-  .lens-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px; }
-  .lens-head strong { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#aaa; font-weight:600; }
-  .lens-head span { max-width:58%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#696969; font-size:8px; text-align:right; }
-  .diff-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
-  .diff-box { min-width:0; min-height:72px; padding:7px 8px 8px; border:1px solid #2d2d2d; border-radius:7px; background:#151515; }
-  .diff-label { display:block; margin-bottom:5px; color:#6f6f6f; font-size:8px; letter-spacing:.11em; text-transform:uppercase; }
-  .diff-copy { max-height:82px; overflow:auto; font-family:"Baskervville Local","Baskervville",Georgia,serif; font-size:10px; line-height:1.3; color:#c7c7c2; }
-  .diff-copy.removed { color:#989894; }
-  .diff-snippet { display:block; margin:0 0 4px; }
-  .diff-copy.removed .diff-snippet { text-decoration:line-through; text-decoration-thickness:.65px; }
-  .diff-empty { color:#565656; font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:9px; }
-  .diff-note { margin:7px 1px 0; color:#666; font-size:8.5px; line-height:1.4; }
-
-  .axis-card { margin-top:12px; padding-top:11px; border-top:1px solid #303030; }
-  .axis-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:8px; }
-  .axis-cell { min-width:0; padding:7px 6px; border:1px solid #2d2d2d; border-radius:7px; background:#151515; text-align:center; }
-  .axis-cell span { display:block; color:#696969; font-size:7.5px; letter-spacing:.10em; text-transform:uppercase; }
-  .axis-cell strong { display:block; margin-top:3px; color:#c7c7c2; font-size:10px; font-weight:500; }
-  .semantic-readout { margin-top:8px; color:#777; font-size:9px; line-height:1.4; }
-  .semantic-readout b { color:#b9b9b4; font-weight:500; }
-
-  .kinetic-readout { margin-top:8px; color:#777; font-size:9px; line-height:1.45; }
-  .kinetic-readout b { color:#b9b9b4; font-weight:500; }
-  .diff-token { display:inline-block; padding:0 1px; border-radius:2px; cursor:crosshair; transition:background .14s ease,color .14s ease; }
-  .diff-token:hover, .diff-token.inspecting { background:#3a342f; color:#fffdf7; box-shadow:0 0 0 1px #6a5d50 inset; }
-
-  .variable-title {
-    transform-box: fill-box;
-    transform-origin: center;
-    will-change: font-variation-settings, opacity, filter, letter-spacing;
-  }
-  .variable-title.revision-reset {
-    animation: archive-typeset-reset var(--reset-duration, .82s) cubic-bezier(.18,.72,.22,1) both;
-  }
-
-  .semantic-watermark {
-    transform-box: fill-box;
-    transform-origin: center;
-    pointer-events: none;
-    will-change: font-variation-settings, opacity, filter;
-    transition: opacity .22s ease, filter .22s ease;
-  }
-  .semantic-hit-target { cursor: pointer; pointer-events: all; }
-
-  .forensic-burst, .forensic-burst-halo {
-    transform-box: fill-box;
-    transform-origin: center;
-    pointer-events: none;
-    will-change: transform, opacity, filter, font-variation-settings;
-  }
-  .forensic-burst {
-    animation: archive-forensic-burst 3.2s cubic-bezier(.12,.78,.18,1) forwards;
-  }
-  .forensic-burst-halo {
-    animation: archive-forensic-burst-halo 3.2s cubic-bezier(.12,.78,.18,1) forwards;
-  }
-  .forensic-sparkle,
-  .forensic-sparkle-core {
-    transform-box: fill-box;
-    transform-origin: center;
-    pointer-events: none;
-    will-change: transform, opacity, filter;
-  }
-  .forensic-sparkle {
-    animation: archive-forensic-sparkle 3.2s cubic-bezier(.12,.78,.18,1) forwards;
-  }
-  .forensic-sparkle-core {
-    animation: archive-forensic-sparkle-core 3.2s cubic-bezier(.12,.78,.18,1) forwards;
-  }
-  .semantic-watermark.ghost-breathe {
-    animation: archive-ghost-breathe var(--ghost-duration, 6.5s) ease-in-out infinite alternate;
-  }
-  .semantic-watermark.forensic-active {
-    animation: archive-forensic-restore .42s cubic-bezier(.22,.72,.24,1) both;
-  }
-
-  @keyframes archive-typeset-reset {
-    0% {
-      font-variation-settings:'wght' var(--reset-wght-a), 'opsz' var(--reset-opsz-a), 'SOFT' var(--reset-soft-a), 'WONK' var(--reset-wonk-a);
-      opacity:var(--reset-opacity-a,.42);
-      filter:blur(1.2px);
-      letter-spacing:var(--reset-track-a,.02em);
-    }
-    43% {
-      font-variation-settings:'wght' var(--reset-wght-b), 'opsz' var(--reset-opsz-b), 'SOFT' var(--reset-soft-b), 'WONK' var(--reset-wonk-b);
-      opacity:var(--reset-opacity-b,.92);
-      filter:blur(.22px);
-      letter-spacing:var(--reset-track-b,.09em);
-    }
-    100% {
-      font-variation-settings:'wght' var(--reset-wght-c), 'opsz' var(--reset-opsz-c), 'SOFT' var(--reset-soft-c), 'WONK' var(--reset-wonk-c);
-      opacity:var(--reset-opacity-c,.86);
-      filter:blur(0);
-      letter-spacing:var(--reset-track-c,.04em);
-    }
-  }
-
-  @keyframes archive-ghost-breathe {
-    0% {
-      font-variation-settings:'wght' var(--ghost-wght-a), 'opsz' var(--ghost-opsz-a), 'SOFT' var(--ghost-soft-a), 'WONK' var(--ghost-wonk-a);
-      opacity:var(--ghost-opacity-a,.045);
-      filter:blur(var(--ghost-blur-a,.8px));
-    }
-    55% {
-      opacity:var(--ghost-opacity-mid,.075);
-      filter:blur(var(--ghost-blur-mid,.32px));
-    }
-    100% {
-      font-variation-settings:'wght' var(--ghost-wght-b), 'opsz' var(--ghost-opsz-b), 'SOFT' var(--ghost-soft-b), 'WONK' var(--ghost-wonk-b);
-      opacity:var(--ghost-opacity-b,.105);
-      filter:blur(var(--ghost-blur-b,.15px));
-    }
-  }
-
-
-  .forensic-restored {
-    transform-box:fill-box;
-    transform-origin:center;
-    pointer-events:none;
-    animation:archive-forensic-surface .46s cubic-bezier(.18,.76,.22,1) both;
-  }
-
-  @keyframes archive-forensic-surface {
-    0% { opacity:.04; filter:blur(4px); transform:scale(.985); }
-    58% { opacity:.82; filter:blur(.15px); transform:scale(1.012); }
-    100% { opacity:.68; filter:blur(0); transform:scale(1); }
-  }
-  @keyframes archive-forensic-restore {
-    0% { opacity:.08; filter:blur(.8px); }
-    100% { opacity:var(--forensic-opacity,.34); filter:blur(0); }
-  }
-  @keyframes archive-forensic-burst {
-    0% { opacity:.02; filter:blur(6px); transform:translateY(0) scale(.68); }
-    14% { opacity:.98; filter:blur(.08px); transform:translateY(-26px) scale(1.22); }
-    34% { opacity:.96; filter:blur(0); transform:translateY(-56px) scale(1.13); }
-    58% { opacity:.72; filter:blur(.18px); transform:translateY(-92px) scale(1.14); }
-    78% { opacity:.4; filter:blur(.75px); transform:translateY(-124px) scale(1.18); }
-    100% { opacity:0; filter:blur(3.3px); transform:translateY(-176px) scale(1.24); }
-  }
-  @keyframes archive-forensic-burst-halo {
-    0% { opacity:0; filter:blur(8px); transform:translateY(0) scale(.68); }
-    13% { opacity:.82; filter:blur(1.4px); transform:translateY(-24px) scale(1.28); }
-    42% { opacity:.48; filter:blur(2.4px); transform:translateY(-68px) scale(1.18); }
-    72% { opacity:.18; filter:blur(4.4px); transform:translateY(-118px) scale(1.22); }
-    100% { opacity:0; filter:blur(9px); transform:translateY(-176px) scale(1.32); }
-  }
-  @keyframes archive-forensic-sparkle {
-    0% { opacity:0; filter:blur(4px); transform:translate(0,0) scale(.35) rotate(0deg); }
-    16% { opacity:.95; filter:blur(.15px); transform:translate(var(--sparkle-x1), var(--sparkle-y1)) scale(1.18) rotate(20deg); }
-    42% { opacity:.78; filter:blur(0); transform:translate(var(--sparkle-x2), var(--sparkle-y2)) scale(1.02) rotate(76deg); }
-    72% { opacity:.34; filter:blur(.8px); transform:translate(var(--sparkle-x3), var(--sparkle-y3)) scale(.92) rotate(120deg); }
-    100% { opacity:0; filter:blur(2.6px); transform:translate(var(--sparkle-x4), var(--sparkle-y4)) scale(.68) rotate(160deg); }
-  }
-  @keyframes archive-forensic-sparkle-core {
-    0% { opacity:0; filter:blur(6px); transform:scale(.2); }
-    14% { opacity:.92; filter:blur(.2px); transform:scale(1.24); }
-    38% { opacity:.55; filter:blur(.6px); transform:scale(.92); }
-    100% { opacity:0; filter:blur(3.2px); transform:scale(.24); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .variable-title.revision-reset,
-    .semantic-watermark.ghost-breathe,
-    .semantic-watermark.forensic-active,
-    .forensic-burst, .forensic-burst-halo { animation:none !important; }
-  }
-
   @media (max-width: 850px) {
     .app { grid-template-columns: 1fr; }
     .panel { max-height: none; border-right: 0; border-bottom: 1px solid var(--ui-line); }
     .stage { padding: 24px 12px 40px; }
-    .poster-stack { width: min(92vw, 620px); }
+    .poster-shell { width: min(92vw, 620px); }
   }
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="panel">
-    <p class="eyebrow">Live typographic generator</p>
-    <h1>The Living Archive</h1>
-    <p class="subhead">A live publication driven by Wikipedia's recent-change stream. Real edits reshape the title page while the generator preserves the archival visual grammar.</p>
-
-    <fieldset class="live-card">
-      <legend>Live data · Wikipedia</legend>
-      <div class="stream-line"><span class="status-dot" id="streamDot"></span><strong id="streamStatus">Connecting to recent changes…</strong></div>
-      <div class="data-grid">
-        <div class="metric"><span>Article</span><strong id="liveArticle">Waiting for an edit</strong></div>
-        <div class="metric"><span>Editor</span><strong id="liveEditor">—</strong></div>
-        <div class="metric"><span>Change</span><strong id="liveDelta">—</strong></div>
-        <div class="metric"><span>Edits / 30 sec</span><strong id="liveVelocity">0</strong></div>
-        <div class="metric"><span>Since opening</span><strong id="liveCount">0 edits</strong></div>
-        <div class="metric"><span>Volume age</span><strong id="volumeAge">Fresh</strong></div>
-        <div class="metric"><span>Current mode</span><strong id="liveMode">Classical axis</strong></div>
-      </div>
-      <div class="range-row">
-        <label>Data influence <input id="dataInfluence" type="range" min="0" max="100" value="78"></label><output id="dataInfluenceOut">78%</output>
-      </div>
-      <div class="range-row">
-        <label>Revision echoes <input id="echoStrength" type="range" min="0" max="100" value="68"></label><output id="echoStrengthOut">68%</output>
-      </div>
-      <div class="range-row">
-        <label>Decay tempo <input id="decayTempo" type="range" min="0" max="100" value="92"></label><output id="decayTempoOut">92%</output>
-      </div>
-      <label class="check-row"><input id="pauseLive" type="checkbox"> Pause display & inspect revision</label>
-      <div class="live-actions">
-        <button id="reconnect" type="button">Reconnect</button>
-        <button id="newVolume" type="button">Begin new volume</button>
-        <a class="article-link" id="articleLink" href="https://en.wikipedia.org/" target="_blank" rel="noopener">Open current article ↗</a>
-      </div>
-      <div class="revision-lens" id="revisionLens">
-        <div class="lens-head"><strong>Revision lens</strong><span id="diffStatus">Waiting for a revision…</span></div>
-        <div class="diff-grid">
-          <div class="diff-box"><span class="diff-label">Added</span><div class="diff-copy" id="addedDiff"><span class="diff-empty">—</span></div></div>
-          <div class="diff-box"><span class="diff-label">Removed</span><div class="diff-copy removed" id="removedDiff"><span class="diff-empty">—</span></div></div>
-        </div>
-        <p class="diff-note">These are the actual changed fragments from the current Wikipedia revision. Pause the display to hold them while the live stream continues behind the scenes. Hover any individual changed word to pull it out of the poster like a ghost, then watch it fade away.</p>
-      </div>
-      <div class="axis-card">
-        <div class="lens-head"><strong>Variable type · Sprint A</strong><span>Fraunces live axes</span></div>
-        <div class="range-row">
-          <label>Type-data influence <input id="typeInfluence" type="range" min="0" max="100" value="86"></label><output id="typeInfluenceOut">86%</output>
-        </div>
-        <div class="axis-grid">
-          <div class="axis-cell"><span>wght</span><strong id="axisWght">400</strong></div>
-          <div class="axis-cell"><span>opsz</span><strong id="axisOpsz">72</strong></div>
-          <div class="axis-cell"><span>SOFT</span><strong id="axisSoft">50</strong></div>
-          <div class="axis-cell"><span>WONK</span><strong id="axisWonk">0</strong></div>
-        </div>
-        <div class="semantic-readout">Semantic watermark: <b id="semanticWord">waiting for diff</b></div>
-      </div>
-      <div class="axis-card">
-        <div class="lens-head"><strong>Kinetic type · Sprint B</strong><span>reset · haunt · restore</span></div>
-        <div class="range-row">
-          <label>Motion influence <input id="motionInfluence" type="range" min="0" max="100" value="82"></label><output id="motionInfluenceOut">82%</output>
-        </div>
-        <label class="check-row"><input id="ghostMotion" type="checkbox" checked> Semantic ghost breathing</label>
-        <div class="axis-grid">
-          <div class="axis-cell"><span>Reset</span><strong id="resetPulseReadout">0.82s</strong></div>
-          <div class="axis-cell"><span>Ghost</span><strong id="ghostCycleReadout">6.5s</strong></div>
-          <div class="axis-cell"><span>Mode</span><strong id="motionModeReadout">settled</strong></div>
-          <div class="axis-cell"><span>Hover</span><strong>restore</strong></div>
-        </div>
-        <div class="kinetic-readout">Incoming revisions briefly <b>re-set the title</b>; changed language <b>breathes like a ghost</b>; hover changed words—or the ghost word on the poster—to <b>pull them out of the archive before they fade away</b>.</div>
-      </div>
-      <p class="mapping-note">Magnitude → type scale · additions/removals → tracking and palette tone · edit velocity → frame · accumulated edits + time in the current volume → escalating specks, foxing, abrasion, and paper loss · actual changed words → marginal revision echoes · edit magnitude / direction / velocity / editor type → Fraunces variable axes · new revisions → typesetting reset pulse · edit velocity → ghost-breathing tempo · Revision Lens / poster-word hover → spectral extraction and fade.</p>
-    </fieldset>
+    <p class="eyebrow">Typographic generator</p>
+    <h1>Ghost Title-Page</h1>
+    <p class="subhead">A constrained tool based on the selected archival pink poster. The interface lets content vary while protecting the original visual grammar.</p>
 
     <fieldset>
-      <legend>Live content · editable when frozen</legend>
-      <label>Intro / italic accent <input id="intro" type="text" value="A LIVE REVISION"></label>
-      <label>Title line 1 <input id="title1" type="text" value="THE LIVING"></label>
+      <legend>Content</legend>
+      <label>Intro / italic accent <input id="intro" type="text" value="AN AFTERIMAGE"></label>
+      <label>Title line 1 <input id="title1" type="text" value="THE QUIET"></label>
       <label>Title line 2 <input id="title2" type="text" value="ARCHIVE"></label>
       <label>Title line 3 <input id="title3" type="text" value=""></label>
-      <label>Subtitle <input id="subtitle" type="text" value="WAITING FOR WIKIPEDIA RECENT CHANGES"></label>
-      <label>Attribution phrase <input id="attrib" type="text" value="EDITED BY"></label>
-      <label>Name / person <input id="person" type="text" value="THE PUBLIC"></label>
-      <label>Publisher <input id="publisher" type="text" value="EN.WIKIPEDIA.ORG"></label>
-      <label>Location <input id="location" type="text" value="LIVE · UTC"></label>
+      <label>Subtitle <input id="subtitle" type="text" value="NOTES ON MEMORY AND DISTANCE"></label>
+      <label>Attribution phrase <input id="attrib" type="text" value="ARRANGED BY"></label>
+      <label>Name / person <input id="person" type="text" value="JOHANN SETIAWAN"></label>
+      <label>Publisher <input id="publisher" type="text" value="AFTERIMAGE PRESS"></label>
+      <label>Location <input id="location" type="text" value="NEW YORK"></label>
     </fieldset>
 
     <fieldset>
@@ -580,45 +287,33 @@
         <label>Texture <input id="texture" type="range" min="0" max="100" value="38"></label><output id="textureOut">38</output>
       </div>
       <div class="range-row">
-        <label>Specks / freckles <input id="specks" type="range" min="0" max="100" value="30"></label><output id="specksOut">30</output>
-      </div>
-      <div class="range-row">
-        <label>Foxing / stains <input id="foxing" type="range" min="0" max="100" value="24"></label><output id="foxingOut">24</output>
-      </div>
-      <div class="range-row">
-        <label>Scratches / abrasion <input id="abrasion" type="range" min="0" max="100" value="20"></label><output id="abrasionOut">20</output>
-      </div>
-      <div class="range-row">
-        <label>Paper loss / erosion <input id="erosion" type="range" min="0" max="100" value="8"></label><output id="erosionOut">8</output>
+        <label>Aging / specks <input id="aging" type="range" min="0" max="100" value="30"></label><output id="agingOut">30</output>
       </div>
       <label class="check-row"><input id="dividers" type="checkbox" checked> Show divider marks</label>
     </fieldset>
 
     <div class="buttons">
-      <button class="primary" id="variation">Generate alternate interpretation</button>
+      <button class="primary" id="variation">Generate restrained variation</button>
       <p class="variation-status" id="variationStatus">Composition: Classical axis</p>
       <button id="reset">Reset</button>
       <button id="exportSvg">Export SVG</button>
       <button id="printPdf">Print / Save PDF</button>
     </div>
 
-    <p class="hint">The live stream continues while you generate alternate interpretations. Pause the display to inspect the exact added and removed fragments; those words also appear as restrained marginal echoes on the poster. Decay tempo determines how quickly the current volume ages toward ruin.</p>
+    <p class="hint">SVG is the main handoff format. Install/download Baskervville locally before opening the export in Illustrator if you want exact font fidelity and editable text.</p>
   </aside>
 
   <main class="stage">
-    <div class="poster-stack">
-      <div class="history-stack" id="historyStack" aria-hidden="true"></div>
-      <div class="poster-shell" id="posterShell">
-        <svg id="poster" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1015 1500" role="img" aria-label="Generated poster preview">
-          <defs>
-            <filter id="paperNoise" x="-10%" y="-10%" width="120%" height="120%">
-              <feTurbulence id="noiseTurbulence" type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"/>
-              <feColorMatrix type="saturate" values="0"/>
-            </filter>
-          </defs>
-          <g id="artwork"></g>
-        </svg>
-      </div>
+    <div class="poster-shell">
+      <svg id="poster" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1015 1500" role="img" aria-label="Generated poster preview">
+        <defs>
+          <filter id="paperNoise" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence id="noiseTurbulence" type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="7" stitchTiles="stitch" result="noise"/>
+            <feColorMatrix type="saturate" values="0"/>
+          </filter>
+        </defs>
+        <g id="artwork"></g>
+      </svg>
     </div>
   </main>
 </div>
@@ -626,36 +321,13 @@
 <script>
 (() => {
   const $ = (id) => document.getElementById(id);
-  const inputs = ["intro","title1","title2","title3","subtitle","attrib","person","publisher","location","fontFamily","palette","scale","tracking","frameSize","frameTexture","texture","specks","foxing","abrasion","erosion","dividers","dataInfluence","echoStrength","decayTempo","typeInfluence","motionInfluence","ghostMotion"];
-  const manualStructuralDefaults = {scale:100, tracking:100, frameSize:135, frameTexture:42, texture:38, specks:30, foxing:24, abrasion:20, erosion:8};
+  const inputs = ["intro","title1","title2","title3","subtitle","attrib","person","publisher","location","fontFamily","palette","scale","tracking","frameSize","frameTexture","texture","aging","dividers"];
   const defaults = {};
   inputs.forEach(id => { const el = $(id); defaults[id] = el.type === "checkbox" ? el.checked : el.value; });
 
   let layoutSeed = 17;
   let compositionMode = 0;
   let extremeSummary = "";
-  let eventSource = null;
-  let pendingChange = null;
-  let currentChange = null;
-  let lastCommitAt = 0;
-  let totalLiveEvents = 0;
-  let recentEventTimes = [];
-  let liveVisual = {magnitude:0, direction:0, velocity:0, age:0};
-  let previousTypeAxes = {wght:400, opsz:72, soft:50, wonk:0};
-  let currentTypeAxes = {wght:400, opsz:72, soft:50, wonk:0};
-  let revisionPulseActive = false;
-  let revisionPulseTimer = null;
-  let forensicOverride = null;
-  let livePaletteShift = {hue:0, darkness:0};
-  let currentDiff = {added:[], removed:[], status:"Waiting for a revision…", key:""};
-  let diffRequestSerial = 0;
-  let historyPages = [];
-  let lastHistorySignature = "";
-  let volumeStartedAt = Date.now();
-  let volumeStartEventCount = 0;
-  let sessionTextLegibility = 1;
-  const STREAM_URL = "https://stream.wikimedia.org/v2/stream/recentchange";
-  const COMPARE_API = "https://en.wikipedia.org/w/api.php";
   const compositionNames = [
     "Classical axis",
     "High cluster",
@@ -667,8 +339,6 @@
     "Offset bands"
   ];
   const artwork = $("artwork");
-  const historyStack = $("historyStack");
-  const posterShell = $("posterShell");
 
   function svgEl(name, attrs = {}, text = "") {
     const el = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -723,85 +393,16 @@
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
 
-  function hexToRgb(hex) {
-    const raw = hex.replace("#", "");
-    return {
-      r: parseInt(raw.slice(0,2),16),
-      g: parseInt(raw.slice(2,4),16),
-      b: parseInt(raw.slice(4,6),16)
-    };
-  }
-
-  function rgbToHex(r, g, b) {
-    const toHex = v => Math.round(clamp(v, 0, 255)).toString(16).padStart(2, "0");
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
-
-  function blendHex(a, b, t) {
-    const ca = hexToRgb(a), cb = hexToRgb(b);
-    return rgbToHex(
-      ca.r + (cb.r - ca.r) * t,
-      ca.g + (cb.g - ca.g) * t,
-      ca.b + (cb.b - ca.b) * t
-    );
-  }
-
-  function desaturateHex(hex, amount) {
-    const hsl = hexToHsl(hex);
-    return hslToHex(hsl.h, hsl.s * (1 - amount), hsl.l);
-  }
-
-  function shiftLightness(hex, delta) {
-    const hsl = hexToHsl(hex);
-    return hslToHex(hsl.h, hsl.s, clamp(hsl.l + delta, 0, 100));
-  }
-
-  function applyAgePaletteDrift(volumeAge) {
-    const drift = clamp((volumeAge - 0.14) / 3.15, 0, 1);
-    if (drift <= 0) return;
-
-    // Severe aging should darken and dirty the whole poster, not only the marks placed on top.
-    const paperBase = $("paper").value;
-    const frameBase = $("frame").value;
-    const inkBase = $("ink").value;
-
-    let paper = desaturateHex(paperBase, 0.24 + drift * 0.76);
-    paper = blendHex(paper, "#d7c3a4", drift * 0.28);
-    paper = blendHex(paper, "#9e8361", Math.max(0, drift - 0.18) * 0.42);
-    paper = blendHex(paper, "#6d5642", Math.max(0, drift - 0.58) * 0.28);
-    paper = shiftLightness(paper, -drift * 13.5);
-
-    let frame = desaturateHex(frameBase, 0.28 + drift * 0.82);
-    frame = blendHex(frame, "#8e7153", drift * 0.34);
-    frame = blendHex(frame, "#5a4533", Math.max(0, drift - 0.22) * 0.46);
-    frame = blendHex(frame, "#2f241c", Math.max(0, drift - 0.68) * 0.26);
-    frame = shiftLightness(frame, -drift * 18.5);
-
-    let ink = desaturateHex(inkBase, 0.36 + drift * 0.88);
-    ink = blendHex(ink, "#4f3f31", drift * 0.28);
-    ink = blendHex(ink, "#241914", Math.max(0, drift - 0.22) * 0.56);
-    ink = shiftLightness(ink, -drift * 17.5);
-
-    $("paper").value = paper;
-    $("frame").value = frame;
-    $("ink").value = ink;
-    $("paperSwatch").style.background = paper;
-    $("frameSwatch").style.background = frame;
-    $("inkSwatch").style.background = ink;
-  }
-
   function calibratePalette() {
     const source = hexToHsl($("palette").value);
     const neutral = source.s < 3;
-    const influence = Number($("dataInfluence").value || 0) / 100;
-    const h = source.h + livePaletteShift.hue * influence;
-    const dark = livePaletteShift.darkness * influence;
+    const h = source.h;
 
-    // Same calibrated relationship as the poster generator; live data may only nudge
-    // the whole family together, never break the monochromatic system.
-    const paper = hslToHex(h - 2, neutral ? 0 : 30 - dark*5, 80 - dark*3.5);
-    const frame = hslToHex(h, neutral ? 0 : 26 - dark*4, 71.5 - dark*4.2);
-    const ink = hslToHex(h + 0.3, neutral ? 0 : 18 - dark*2, 53.3 - dark*2.8);
+    // These values reproduce the reference poster's relationship:
+    // light/desaturated paper, slightly darker frame, restrained low-saturation ink.
+    const paper = hslToHex(h - 2, neutral ? 0 : 30, 80);
+    const frame = hslToHex(h, neutral ? 0 : 26, 71.5);
+    const ink = hslToHex(h + 0.3, neutral ? 0 : 18, 53.3);
 
     $("paper").value = paper;
     $("frame").value = frame;
@@ -817,310 +418,6 @@
       : "'Baskervville Local', 'Baskervville', Georgia, serif";
   }
 
-  function frauncesFamily() {
-    return "'Fraunces', 'Baskervville Local', 'Baskervville', Georgia, serif";
-  }
-
-  function axisString(a) {
-    return `'wght' ${Math.round(a.wght)}, 'opsz' ${Number(a.opsz).toFixed(1)}, 'SOFT' ${Math.round(a.soft)}, 'WONK' ${a.wonk ? 1 : 0}`;
-  }
-
-  function computeVariableAxes() {
-    const influence = Number($("typeInfluence").value || 0) / 100;
-    const titleText = [$("title1").value,$("title2").value,$("title3").value].join(" ").trim();
-    const titleLength = clamp(titleText.length / 44, 0, 1);
-    const bot = Boolean(currentChange?.bot);
-    const direction = liveVisual.direction || 0;
-    const magnitude = liveVisual.magnitude || 0;
-    const velocity = liveVisual.velocity || 0;
-
-    // Data targets: big edits gain weight; additions become softer/inkier; removals sharpen.
-    const target = {
-      wght: clamp(300 + magnitude*360 + Math.max(direction,0)*120 - Math.max(-direction,0)*70 + velocity*40, 180, 850),
-      opsz: clamp(132 - titleLength*92 + magnitude*18, 12, 144),
-      soft: clamp(48 + direction*44 + magnitude*10, 0, 100),
-      wonk: bot ? 0 : 1
-    };
-    const neutral = {wght:400, opsz:72, soft:48, wonk:0};
-    currentTypeAxes = {
-      wght: lerp(neutral.wght, target.wght, influence),
-      opsz: lerp(neutral.opsz, target.opsz, influence),
-      soft: lerp(neutral.soft, target.soft, influence),
-      wonk: influence > .45 ? target.wonk : 0
-    };
-
-    $("axisWght").textContent = Math.round(currentTypeAxes.wght);
-    $("axisOpsz").textContent = Math.round(currentTypeAxes.opsz);
-    $("axisSoft").textContent = Math.round(currentTypeAxes.soft);
-    $("axisWonk").textContent = currentTypeAxes.wonk ? "1" : "0";
-    return currentTypeAxes;
-  }
-
-  function kineticProfile() {
-    const influence = Number($("motionInfluence").value || 0) / 100;
-    const velocity = clamp(liveVisual.velocity || 0, 0, 1);
-    const magnitude = clamp(liveVisual.magnitude || 0, 0, 1);
-    const resetDuration = lerp(.98, .46, influence * (.35 + velocity*.65));
-    const ghostDuration = lerp(8.4, 3.5, influence * (.28 + velocity*.72));
-    const amplitude = influence * (.42 + magnitude*.34 + velocity*.24);
-    return {influence, velocity, magnitude, resetDuration, ghostDuration, amplitude};
-  }
-
-  function triggerRevisionPulse() {
-    revisionPulseActive = true;
-    clearTimeout(revisionPulseTimer);
-    revisionPulseTimer = setTimeout(() => {
-      revisionPulseActive = false;
-      if ($("motionModeReadout")) $("motionModeReadout").textContent = "settled";
-    }, 1100);
-  }
-
-  function configureTitleKinetics(el, axes, opacity=.86, trackingEm=.04) {
-    if (!el) return;
-    el.classList.add("variable-title");
-    const p = kineticProfile();
-    const direction = liveVisual.direction || 0;
-    const added = direction >= 0;
-    const overshoot = {
-      wght: clamp(axes.wght + (added ? 120 : -95) * p.amplitude, 100, 900),
-      opsz: clamp(axes.opsz + (added ? -15 : 20) * p.amplitude, 9, 144),
-      soft: clamp(axes.soft + (added ? 30 : -28) * p.amplitude, 0, 100),
-      wonk: axes.wonk
-    };
-    const from = previousTypeAxes;
-    const vars = {
-      "--reset-wght-a":Math.round(from.wght), "--reset-opsz-a":Number(from.opsz).toFixed(1), "--reset-soft-a":Math.round(from.soft), "--reset-wonk-a":from.wonk?1:0,
-      "--reset-wght-b":Math.round(overshoot.wght), "--reset-opsz-b":Number(overshoot.opsz).toFixed(1), "--reset-soft-b":Math.round(overshoot.soft), "--reset-wonk-b":overshoot.wonk?1:0,
-      "--reset-wght-c":Math.round(axes.wght), "--reset-opsz-c":Number(axes.opsz).toFixed(1), "--reset-soft-c":Math.round(axes.soft), "--reset-wonk-c":axes.wonk?1:0,
-      "--reset-opacity-a":Math.max(.12, opacity*.52).toFixed(3), "--reset-opacity-b":Math.min(1,opacity*1.03).toFixed(3), "--reset-opacity-c":opacity.toFixed(3),
-      "--reset-track-a":`${Math.max(.005,trackingEm*.48).toFixed(3)}em`, "--reset-track-b":`${(trackingEm*1.42).toFixed(3)}em`, "--reset-track-c":`${trackingEm.toFixed(3)}em`,
-      "--reset-duration":`${p.resetDuration.toFixed(2)}s`
-    };
-    Object.entries(vars).forEach(([k,v]) => el.style.setProperty(k,v));
-    if (revisionPulseActive && p.influence > .02) el.classList.add("revision-reset");
-    if ($("resetPulseReadout")) $("resetPulseReadout").textContent = `${p.resetDuration.toFixed(2)}s`;
-    if ($("ghostCycleReadout")) $("ghostCycleReadout").textContent = `${p.ghostDuration.toFixed(1)}s`;
-    if ($("motionModeReadout")) $("motionModeReadout").textContent = revisionPulseActive ? "re-setting" : (forensicOverride ? "forensic" : "settled");
-  }
-
-  function variableTitleNode(text, y, size, trackingEm, opacity=.86, extra={}) {
-    if (!text.trim()) return null;
-    const axes = currentTypeAxes;
-    const attrs = {
-      x:507.5, y, "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":size, "font-style":"normal",
-      "font-weight":"400", "letter-spacing":`${trackingEm}em`, fill:$("ink").value,
-      opacity:opacity*sessionTextLegibility,
-      style:`font-variation-settings:${axisString(axes)};`,
-      ...extra
-    };
-    const t = svgEl("text", attrs, text);
-    artwork.appendChild(t);
-    const impression = svgEl("text", {...attrs, x:Number(attrs.x)+.7, y:y+.9, opacity:Math.max(.045, opacity*.09)}, text);
-    artwork.insertBefore(impression, t);
-    configureTitleKinetics(t, axes, opacity*sessionTextLegibility, trackingEm);
-    return t;
-  }
-
-  function semanticWord() {
-    if (forensicOverride?.word) return forensicOverride;
-    const stop = new Set(["the","and","for","with","from","that","this","was","were","are","have","has","into","onto","about","over","under","after","before","their","they","them","its","not","but","you","your","his","her","our","out","new","edit","edited","added","removed","page","article","wikipedia"]);
-    const scoreWords = (items, kind) => {
-      const ws = diffWords(items, 80)
-        .map(w => w.replace(/^[-'’]+|[-'’]+$/g,""))
-        .filter(w => w.length >= 4 && !stop.has(w.toLowerCase()) && !/^\d+$/.test(w));
-      return ws.map(w => ({word:w, kind, score:w.length + (/[A-Z]/.test(w[0]) ? 1.6 : 0)}));
-    };
-    const candidates = [...scoreWords(currentDiff.added,"added"), ...scoreWords(currentDiff.removed,"removed")];
-    if (!candidates.length) return null;
-    candidates.sort((a,b)=>b.score-a.score);
-    return candidates[0];
-  }
-
-  function addSemanticWatermark(cx, cy, cw, ch) {
-    const semantic = semanticWord();
-    if (!semantic) { $("semanticWord").textContent = "waiting for diff"; return; }
-    $("semanticWord").textContent = `${semantic.word} · ${semantic.kind}${forensicOverride ? " · forensic" : ""}`;
-    const rnd = seededRandom(layoutSeed + hashText(semantic.word) + 731);
-    const added = semantic.kind === "added";
-    const baseAxes = currentTypeAxes;
-    let axes = {
-      wght: added ? clamp(baseAxes.wght + 150, 260, 900) : clamp(baseAxes.wght - 170, 100, 620),
-      opsz: added ? clamp(baseAxes.opsz - 18, 12, 144) : clamp(baseAxes.opsz + 24, 18, 144),
-      soft: added ? clamp(baseAxes.soft + 28, 0, 100) : clamp(baseAxes.soft - 34, 0, 100),
-      wonk: currentChange?.bot ? 0 : 1
-    };
-    if (forensicOverride) {
-      axes = {wght:500, opsz:72, soft:52, wonk:0};
-    }
-    const word = semantic.word.toUpperCase();
-    const fontSize = clamp(cw / Math.max(4.2, word.length*.62), 64, 168);
-    const x = cx + cw*(.50 + (rnd()-.5)*.10);
-    const y = cy + ch*(.47 + (rnd()-.5)*.16);
-    const echo = Number($("echoStrength").value||0)/100;
-    const baseOpacity = (0.035 + echo * .065) * sessionTextLegibility;
-    const opacity = forensicOverride ? Math.max(.22, .36*sessionTextLegibility) : baseOpacity;
-    const t = svgEl("text", {
-      id:"semanticWatermark", class:"semantic-watermark",
-      x:x.toFixed(2), y:y.toFixed(2), "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":fontSize.toFixed(2), "font-weight":"400",
-      "letter-spacing":forensicOverride ? ".025em" : (added ? ".015em" : ".075em"), fill:$("ink").value, opacity:opacity.toFixed(3),
-      style:`font-variation-settings:${axisString(axes)};`,
-      "aria-label":`${semantic.kind} semantic watermark`
-    }, word);
-
-    const p = kineticProfile();
-    const amp = 1 + p.amplitude;
-    const a = {
-      wght:clamp(axes.wght + (added ? -75 : 55)*amp,100,900),
-      opsz:clamp(axes.opsz + (added ? 12 : -8)*amp,9,144),
-      soft:clamp(axes.soft + (added ? -18 : 14)*amp,0,100),
-      wonk:axes.wonk
-    };
-    const b = {
-      wght:clamp(axes.wght + (added ? 92 : -82)*amp,100,900),
-      opsz:clamp(axes.opsz + (added ? -11 : 14)*amp,9,144),
-      soft:clamp(axes.soft + (added ? 22 : -20)*amp,0,100),
-      wonk:axes.wonk
-    };
-    const vars = {
-      "--ghost-wght-a":Math.round(a.wght), "--ghost-opsz-a":Number(a.opsz).toFixed(1), "--ghost-soft-a":Math.round(a.soft), "--ghost-wonk-a":a.wonk?1:0,
-      "--ghost-wght-b":Math.round(b.wght), "--ghost-opsz-b":Number(b.opsz).toFixed(1), "--ghost-soft-b":Math.round(b.soft), "--ghost-wonk-b":b.wonk?1:0,
-      "--ghost-opacity-a":Math.max(.018,baseOpacity*.58).toFixed(3), "--ghost-opacity-mid":Math.max(.025,baseOpacity*.86).toFixed(3), "--ghost-opacity-b":Math.max(.03,baseOpacity*1.28).toFixed(3),
-      "--ghost-blur-a":`${(.9-p.influence*.32).toFixed(2)}px`, "--ghost-blur-mid":`${(.42-p.influence*.16).toFixed(2)}px`, "--ghost-blur-b":`${(.18-p.influence*.08).toFixed(2)}px`,
-      "--ghost-duration":`${p.ghostDuration.toFixed(2)}s`, "--forensic-opacity":Math.max(.24,opacity).toFixed(3)
-    };
-    Object.entries(vars).forEach(([k,v])=>t.style.setProperty(k,v));
-    if (forensicOverride) t.classList.add("forensic-active");
-    else if ($("ghostMotion")?.checked && p.influence > .02) t.classList.add("ghost-breathe");
-    artwork.appendChild(t);
-  }
-
-  function spawnForensicBurst(word, kind="added") {
-    if (!word) return;
-    const upper = String(word).toUpperCase();
-    const wm = $("semanticWatermark");
-    const x = wm ? Number(wm.getAttribute("x")) : 507.5;
-    const y = wm ? Number(wm.getAttribute("y")) : 735;
-    const wmSize = wm ? Number(wm.getAttribute("font-size")) : 118;
-    const fontSize = clamp(wmSize * 1.02, 72, 190);
-    const added = kind !== "removed";
-    const axes = added
-      ? {wght:760, opsz:42, soft:82, wonk:currentChange?.bot ? 0 : 1}
-      : {wght:260, opsz:112, soft:8, wonk:currentChange?.bot ? 0 : 1};
-    const sparkleColor = added ? desaturateHex(blendHex($("paper").value, "#fff3cb", .72), .06) : desaturateHex(blendHex($("paper").value, "#d9d4ff", .34), .12);
-    const sparkleStroke = added ? desaturateHex(blendHex($("ink").value, "#6d5031", .34), .12) : desaturateHex(blendHex($("ink").value, "#534763", .28), .18);
-
-    const halo = svgEl("text", {
-      x:x.toFixed(2), y:y.toFixed(2), "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":fontSize.toFixed(2),
-      "letter-spacing":added ? ".01em" : ".065em",
-      fill:$("paper").value, stroke:$("paper").value, "stroke-width":"10", "paint-order":"stroke",
-      opacity:"0", class:"forensic-burst-halo",
-      style:`font-variation-settings:${axisString(axes)};`
-    }, upper);
-    artwork.appendChild(halo);
-
-    const burst = svgEl("text", {
-      x:x.toFixed(2), y:y.toFixed(2), "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":fontSize.toFixed(2),
-      "letter-spacing":added ? ".01em" : ".065em",
-      fill:$("ink").value, opacity:"0", class:"forensic-burst",
-      style:`font-variation-settings:${axisString(axes)};`,
-      "aria-label":`spectral extraction of ${word}`
-    }, upper);
-    artwork.appendChild(burst);
-
-    const core = svgEl("g", {class:"forensic-sparkle-core", opacity:"0"});
-    core.appendChild(svgEl("line", {x1:(x-15).toFixed(2), y1:y.toFixed(2), x2:(x+15).toFixed(2), y2:y.toFixed(2), stroke:sparkleColor, "stroke-width":"2.4", "stroke-linecap":"round"}));
-    core.appendChild(svgEl("line", {x1:x.toFixed(2), y1:(y-15).toFixed(2), x2:x.toFixed(2), y2:(y+15).toFixed(2), stroke:sparkleColor, "stroke-width":"2.4", "stroke-linecap":"round"}));
-    core.appendChild(svgEl("line", {x1:(x-10).toFixed(2), y1:(y-10).toFixed(2), x2:(x+10).toFixed(2), y2:(y+10).toFixed(2), stroke:sparkleColor, "stroke-width":"1.8", "stroke-linecap":"round", opacity:".9"}));
-    core.appendChild(svgEl("line", {x1:(x-10).toFixed(2), y1:(y+10).toFixed(2), x2:(x+10).toFixed(2), y2:(y-10).toFixed(2), stroke:sparkleColor, "stroke-width":"1.8", "stroke-linecap":"round", opacity:".9"}));
-    artwork.appendChild(core);
-
-    const rnd = seededRandom(hashText(word) + layoutSeed + (added ? 77 : 131));
-    const sparkleCount = 9;
-    const sparkleNodes = [];
-    for (let i=0; i<sparkleCount; i++) {
-      const size = 7 + rnd()*11 + (added ? 1.4 : 0);
-      const node = svgEl("g", {class:"forensic-sparkle", opacity:"0"});
-      const lx = size;
-      const sx = size*.48;
-      node.appendChild(svgEl("line", {x1:(x-lx).toFixed(2), y1:y.toFixed(2), x2:(x+lx).toFixed(2), y2:y.toFixed(2), stroke:sparkleColor, "stroke-width":(1.4+rnd()*1.2).toFixed(2), "stroke-linecap":"round"}));
-      node.appendChild(svgEl("line", {x1:x.toFixed(2), y1:(y-lx).toFixed(2), x2:x.toFixed(2), y2:(y+lx).toFixed(2), stroke:sparkleColor, "stroke-width":(1.4+rnd()*1.2).toFixed(2), "stroke-linecap":"round"}));
-      node.appendChild(svgEl("line", {x1:(x-sx).toFixed(2), y1:(y-sx).toFixed(2), x2:(x+sx).toFixed(2), y2:(y+sx).toFixed(2), stroke:sparkleStroke, "stroke-width":(0.9+rnd()*0.7).toFixed(2), "stroke-linecap":"round", opacity:".92"}));
-      node.appendChild(svgEl("line", {x1:(x-sx).toFixed(2), y1:(y+sx).toFixed(2), x2:(x+sx).toFixed(2), y2:(y-sx).toFixed(2), stroke:sparkleStroke, "stroke-width":(0.9+rnd()*0.7).toFixed(2), "stroke-linecap":"round", opacity:".92"}));
-      const angle = (Math.PI*2/sparkleCount) * i + (rnd()-.5)*0.32;
-      const d1 = 18 + rnd()*26;
-      const d2 = d1 + 18 + rnd()*30;
-      const d3 = d2 + 16 + rnd()*28;
-      const d4 = d3 + 14 + rnd()*26;
-      node.style.setProperty('--sparkle-x1', `${(Math.cos(angle)*d1).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-y1', `${(Math.sin(angle)*d1 - 8).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-x2', `${(Math.cos(angle)*d2).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-y2', `${(Math.sin(angle)*d2 - 20).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-x3', `${(Math.cos(angle)*d3).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-y3', `${(Math.sin(angle)*d3 - 44).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-x4', `${(Math.cos(angle)*d4).toFixed(1)}px`);
-      node.style.setProperty('--sparkle-y4', `${(Math.sin(angle)*d4 - 72).toFixed(1)}px`);
-      artwork.appendChild(node);
-      sparkleNodes.push(node);
-    }
-
-    setTimeout(() => { halo.remove(); burst.remove(); core.remove(); sparkleNodes.forEach(n => n.remove()); }, 3400);
-  }
-
-  function addSemanticHoverTarget() {
-    const wm = $("semanticWatermark");
-    if (!wm || !wm.textContent?.trim()) return;
-    const hit = wm.cloneNode(true);
-    hit.removeAttribute("id");
-    hit.setAttribute("class", "semantic-hit-target");
-    hit.setAttribute("opacity", "0.001");
-    hit.setAttribute("fill", "#ffffff");
-    hit.setAttribute("stroke", "#ffffff");
-    hit.setAttribute("stroke-width", "14");
-    hit.setAttribute("paint-order", "stroke");
-    hit.setAttribute("pointer-events", "all");
-    hit.setAttribute("aria-label", `Hover to surface ${wm.textContent}`);
-    hit.style.cursor = "pointer";
-    hit.addEventListener("mouseenter", () => {
-      const semantic = semanticWord();
-      if (semantic) spawnForensicBurst(semantic.word, semantic.kind);
-    });
-    artwork.appendChild(hit);
-  }
-
-  function addForensicRestorationOverlay(cx, cy, cw, ch) {
-    if (!forensicOverride?.word) return;
-    const word = forensicOverride.word.toUpperCase();
-    const rnd = seededRandom(layoutSeed + hashText(forensicOverride.word) + 731);
-    const x = cx + cw*(.50 + (rnd()-.5)*.10);
-    const y = cy + ch*(.47 + (rnd()-.5)*.16);
-    const fontSize = clamp(cw / Math.max(4.2, word.length*.62), 64, 168);
-    const halo = svgEl("text", {
-      x:x.toFixed(2), y:y.toFixed(2), "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":fontSize.toFixed(2),
-      "letter-spacing":".025em", fill:$("paper").value, opacity:.24,
-      style:"font-variation-settings:'wght' 520, 'opsz' 72, 'SOFT' 52, 'WONK' 0;",
-      class:"forensic-restored"
-    }, word);
-    halo.setAttribute("stroke", $("paper").value);
-    halo.setAttribute("stroke-width", "5");
-    halo.setAttribute("paint-order", "stroke");
-    artwork.appendChild(halo);
-
-    const restored = svgEl("text", {
-      x:x.toFixed(2), y:y.toFixed(2), "text-anchor":"middle", "dominant-baseline":"middle",
-      "font-family":frauncesFamily(), "font-size":fontSize.toFixed(2),
-      "letter-spacing":".025em", fill:$("ink").value, opacity:.68,
-      style:"font-variation-settings:'wght' 520, 'opsz' 72, 'SOFT' 52, 'WONK' 0;",
-      class:"forensic-restored",
-      "aria-label":`forensic restoration of ${forensicOverride.word}`
-    }, word);
-    artwork.appendChild(restored);
-  }
-
   function textNode(text, y, size, trackingEm, italic = false, opacity = .86, extra = {}) {
     if (!text.trim()) return null;
     const attrs = {
@@ -1134,7 +431,7 @@
       "font-weight": "400",
       "letter-spacing": `${trackingEm}em`,
       fill: $("ink").value,
-      opacity: opacity * sessionTextLegibility,
+      opacity,
       ...extra
     };
     const t = svgEl("text", attrs, text);
@@ -1149,324 +446,6 @@
     }, text);
     artwork.insertBefore(impression, t);
     return t;
-  }
-
-  function volumeAgeScore() {
-    const minutes = Math.max(0, Date.now() - volumeStartedAt) / 60000;
-    const edits = Math.max(0, totalLiveEvents - volumeStartEventCount);
-    const tempo = Number($("decayTempo").value || 0) / 100;
-    // At maximum tempo, the document can reach a "month-like" ruin state within a few minutes.
-    const minuteDivisor = lerp(8, 0.95, tempo);
-    const editsDivisor = lerp(600, 72, tempo);
-    // Time guarantees aging even during a quiet stream; live edits accelerate handling/wear.
-    // The score is intentionally unbounded. Visual rendering is mapped non-linearly so
-    // performance remains bounded while the document can continue toward illegibility.
-    return minutes / minuteDivisor + edits / editsDivisor;
-  }
-
-  function volumeAgeLabel(score) {
-    if (score < .30) return "Fresh";
-    if (score < .75) return "Handled";
-    if (score < 1.35) return "Worn";
-    if (score < 2.10) return "Foxed";
-    if (score < 3.10) return "Decayed";
-    if (score < 4.20) return "Fading";
-    return "Nearly illegible";
-  }
-
-  function addPosterDarkening(amount) {
-    if (amount <= 0) return;
-    const g = svgEl("g", {"aria-label":"global poster darkening"});
-    const wash = desaturateHex(blendHex($("frame").value, "#3c2c1f", .58), .24 + amount*.28);
-    g.appendChild(svgEl("rect", {
-      x:0, y:0, width:1015, height:1500,
-      fill:wash,
-      opacity:(0.025 + amount * 0.22).toFixed(3)
-    }));
-    if (amount > .35) {
-      const char = desaturateHex(blendHex($("ink").value, "#221711", .78), .2);
-      g.appendChild(svgEl("rect", {
-        x:0, y:0, width:1015, height:1500,
-        fill:char,
-        opacity:(Math.max(0, amount-.35) * 0.08).toFixed(3)
-      }));
-    }
-    artwork.appendChild(g);
-  }
-
-  function addWaterStains(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 18331 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"water stains"});
-    const ring = desaturateHex(blendHex($("frame").value, "#8f6e49", .56), .28 + amount*.18);
-    const fill = desaturateHex(blendHex($("paper").value, "#d8c09f", .46), .2 + amount*.2);
-    const count = Math.round(1 + amount*6);
-    for (let i=0; i<count; i++) {
-      const x = centralX + rnd()*centralW;
-      const y = centralY + rnd()*centralH;
-      const rx = 80 + rnd()*160 + amount*180;
-      const ry = 38 + rnd()*84 + amount*110;
-      g.appendChild(svgEl("ellipse", {
-        cx:x.toFixed(2), cy:y.toFixed(2), rx:rx.toFixed(2), ry:ry.toFixed(2),
-        fill:ring, opacity:(0.03 + amount*(0.03 + rnd()*0.07)).toFixed(3)
-      }));
-      g.appendChild(svgEl("ellipse", {
-        cx:(x + (rnd()-.5)*18).toFixed(2), cy:(y + (rnd()-.5)*14).toFixed(2),
-        rx:(rx*.82).toFixed(2), ry:(ry*.82).toFixed(2),
-        fill:fill, opacity:(0.025 + amount*(0.02 + rnd()*0.05)).toFixed(3)
-      }));
-    }
-    artwork.appendChild(g);
-  }
-
-  function addCreaseTexture(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 19331 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"crease texture"});
-    const shadow = desaturateHex(blendHex($("ink").value, "#4f3b2d", .55), .26 + amount*.22);
-    const highlight = desaturateHex(blendHex($("paper").value, "#f0e3cb", .58), .16);
-    const count = Math.round(8 + amount*34);
-    for (let i=0; i<count; i++) {
-      const x = centralX + rnd()*centralW;
-      const y = centralY + rnd()*centralH;
-      const len = 26 + rnd()*160 + amount*120;
-      const dx = (rnd()-.5) * len;
-      const dy = (rnd()-.5) * len * .4;
-      g.appendChild(svgEl("line", {
-        x1:(x-dx*.5).toFixed(2), y1:(y-dy*.5).toFixed(2), x2:(x+dx*.5).toFixed(2), y2:(y+dy*.5).toFixed(2),
-        stroke:shadow, "stroke-width":(0.5 + rnd()*1.6).toFixed(2),
-        opacity:(0.015 + amount*(0.025 + rnd()*0.06)).toFixed(3), "stroke-linecap":"round"
-      }));
-      g.appendChild(svgEl("line", {
-        x1:(x-dx*.5+1.2).toFixed(2), y1:(y-dy*.5+1).toFixed(2), x2:(x+dx*.5+1.2).toFixed(2), y2:(y+dy*.5+1).toFixed(2),
-        stroke:highlight, "stroke-width":(0.35 + rnd()*1.1).toFixed(2),
-        opacity:(0.012 + amount*(0.02 + rnd()*0.05)).toFixed(3), "stroke-linecap":"round"
-      }));
-    }
-    artwork.appendChild(g);
-  }
-
-  function addTornOuterEdges(amount) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 20331 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"torn outer edges"});
-    const paper = desaturateHex(blendHex($("paper").value, "#efe2ca", .52), .22 + amount*.14);
-    const singe = desaturateHex(blendHex($("frame").value, "#3c281a", .76), .18 + amount*.24);
-    const sides = ["top","bottom","left","right"];
-    sides.forEach(side => {
-      const count = Math.round(2 + amount*8);
-      for (let i=0; i<count; i++) {
-        let x, y, rx, ry;
-        if (side === "top") {
-          x = rnd()*1015; y = rnd()*18; rx = 20 + rnd()*55 + amount*48; ry = 8 + rnd()*20 + amount*18;
-        } else if (side === "bottom") {
-          x = rnd()*1015; y = 1500 - rnd()*18; rx = 20 + rnd()*55 + amount*48; ry = 8 + rnd()*20 + amount*18;
-        } else if (side === "left") {
-          x = rnd()*18; y = rnd()*1500; rx = 8 + rnd()*20 + amount*18; ry = 20 + rnd()*55 + amount*48;
-        } else {
-          x = 1015 - rnd()*18; y = rnd()*1500; rx = 8 + rnd()*20 + amount*18; ry = 20 + rnd()*55 + amount*48;
-        }
-        g.appendChild(svgEl("ellipse", {
-          cx:x.toFixed(2), cy:y.toFixed(2), rx:rx.toFixed(2), ry:ry.toFixed(2),
-          fill:paper, opacity:(0.055 + amount*(0.06 + rnd()*0.15)).toFixed(3)
-        }));
-        if (rnd() < .72) {
-          g.appendChild(svgEl("ellipse", {
-            cx:(x + (side === "left" ? 4 : side === "right" ? -4 : 0)).toFixed(2),
-            cy:(y + (side === "top" ? 4 : side === "bottom" ? -4 : 0)).toFixed(2),
-            rx:(rx*.92).toFixed(2), ry:(ry*.92).toFixed(2),
-            fill:singe, opacity:(0.022 + amount*(0.035 + rnd()*0.10)).toFixed(3)
-          }));
-        }
-      }
-    });
-    artwork.appendChild(g);
-  }
-
-  function addSessionDecay(score, centralX, centralY, centralW, centralH) {
-    if (score <= .08) return;
-    const decayTempo = Number($("decayTempo").value || 0) / 100;
-    const handling = Math.min(1, 1 - Math.exp(-score * (.72 + decayTempo*.42)));
-    const damaged = Math.min(1, 1 - Math.exp(-Math.max(0, score - .36) * (1.06 + decayTempo*.6)));
-    const collapse = Math.min(1, 1 - Math.exp(-Math.max(0, score - .82) * (1.34 + decayTempo*.82)));
-    const ruin = Math.min(1, 1 - Math.exp(-Math.max(0, score - 1.24) * (1.5 + decayTempo*1.02)));
-
-    addTonalArchitecture(Math.min(1, .18 + handling*1.12), Math.max(damaged, collapse*.72), centralX, centralY, centralW, centralH);
-    addWaterStains(Math.min(1, .06 + damaged*1.08), centralX, centralY, centralW, centralH);
-    addFoxing(Math.min(1, .18 + handling*1.24), centralX, centralY, centralW, centralH);
-    addCreaseTexture(Math.min(1, .05 + handling*1.05), centralX, centralY, centralW, centralH);
-    addAbrasion(Math.min(1, .12 + damaged*1.28), centralX, centralY, centralW, centralH);
-    addSpecks(Math.min(1, .15 + handling*1.15), centralX, centralY, centralW, centralH);
-    addEdgeCollapse(Math.min(1, collapse*1.22), centralX, centralY, centralW, centralH);
-    addErosion(Math.min(1, ruin*1.22), centralX, centralY, centralW, centralH);
-    addInkFailure(Math.min(1, Math.max(collapse*.96, ruin)), centralX, centralY, centralW, centralH);
-    addPosterDarkening(Math.min(1, .12 + damaged*0.55 + ruin*0.65));
-    addTornOuterEdges(Math.min(1, Math.max(0, collapse*.28 + ruin*0.96)));
-
-    const g = svgEl("g", {"aria-label":"session ruin veil"});
-    const paper = desaturateHex($("paper").value, .12 + ruin*.16);
-    const char = desaturateHex(blendHex($("ink").value, "#1d120a", .82), .18 + ruin*.22);
-    const sepia = desaturateHex(blendHex($("frame").value, "#6f4f31", .7), .18 + damaged*.24);
-    if (damaged > 0) {
-      g.appendChild(svgEl("rect", {
-        x:0, y:0, width:1015, height:1500,
-        fill:sepia,
-        opacity:(0.016 + damaged*.08).toFixed(3)
-      }));
-    }
-    if (ruin > 0) {
-      const rnd = seededRandom(11457 + Math.floor(score*100));
-      const blotches = Math.round(10 + ruin * 30);
-      for (let i=0; i<blotches; i++) {
-        g.appendChild(svgEl("ellipse", {
-          cx:(rnd()*1015).toFixed(2),
-          cy:(rnd()*1500).toFixed(2),
-          rx:(34 + rnd()*140 + ruin*140).toFixed(2),
-          ry:(12 + rnd()*54 + ruin*72).toFixed(2),
-          fill:rnd() < .66 ? char : paper,
-          opacity:(0.026 + ruin*(0.03 + rnd()*0.11)).toFixed(3)
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addTonalArchitecture(amount, severity, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 22117 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"broad discoloration fields"});
-    const paper = $("paper").value;
-    const sepia = desaturateHex(blendHex(paper, "#9a7042", .58), .34 + severity*.22);
-    const umber = desaturateHex(blendHex($("frame").value, "#5f3d1c", .68), .28 + severity*.28);
-    const dark = desaturateHex(blendHex($("ink").value, "#21140b", .7), .26 + severity*.34);
-    const bleach = desaturateHex(blendHex(paper, "#efe5d1", .75), .42);
-
-    const lightCount = Math.round(2 + amount*10);
-    for (let i=0; i<lightCount; i++) {
-      g.appendChild(svgEl("ellipse", {
-        cx:(centralX + rnd()*centralW).toFixed(2),
-        cy:(centralY + rnd()*centralH).toFixed(2),
-        rx:(35 + rnd()*150 + amount*90).toFixed(2),
-        ry:(16 + rnd()*58 + amount*34).toFixed(2),
-        fill:bleach,
-        opacity:(0.02 + amount*(0.025 + rnd()*0.06)).toFixed(3)
-      }));
-    }
-
-    const midCount = Math.round(3 + amount*14 + severity*8);
-    for (let i=0; i<midCount; i++) {
-      const edgeBias = rnd() < .56;
-      const x = edgeBias ? (rnd()<.5 ? centralX + rnd()*90 : centralX + centralW - rnd()*90) : centralX + rnd()*centralW;
-      const y = edgeBias ? (rnd()<.5 ? centralY + rnd()*90 : centralY + centralH - rnd()*90) : centralY + rnd()*centralH;
-      g.appendChild(svgEl("ellipse", {
-        cx:x.toFixed(2), cy:y.toFixed(2),
-        rx:(30 + rnd()*120 + amount*110).toFixed(2),
-        ry:(10 + rnd()*44 + amount*32).toFixed(2),
-        fill:rnd() < .72 ? sepia : umber,
-        opacity:(0.022 + amount*(0.03 + rnd()*0.08)).toFixed(3)
-      }));
-    }
-
-    if (severity > 0) {
-      const darkCount = Math.round(2 + severity*12);
-      for (let i=0; i<darkCount; i++) {
-        const edgeBias = rnd() < .7;
-        const x = edgeBias ? (rnd()<.5 ? centralX + rnd()*70 : centralX + centralW - rnd()*70) : centralX + rnd()*centralW;
-        const y = edgeBias ? (rnd()<.5 ? centralY + rnd()*80 : centralY + centralH - rnd()*80) : centralY + rnd()*centralH;
-        g.appendChild(svgEl("ellipse", {
-          cx:x.toFixed(2), cy:y.toFixed(2),
-          rx:(28 + rnd()*90 + severity*120).toFixed(2),
-          ry:(9 + rnd()*32 + severity*40).toFixed(2),
-          fill:dark,
-          opacity:(0.028 + severity*(0.04 + rnd()*0.11)).toFixed(3)
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addEdgeCollapse(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 24117 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"edge collapse"});
-    const dark = desaturateHex(blendHex($("ink").value, "#190f09", .78), .34 + amount*.3);
-    const sepia = desaturateHex(blendHex($("frame").value, "#6d4b27", .62), .28 + amount*.22);
-    const paper = desaturateHex($("paper").value, .16 + amount*.22);
-    const sides = [
-      {x:centralX, y:centralY, w:centralW, h:0},
-      {x:centralX, y:centralY+centralH, w:centralW, h:0},
-      {x:centralX, y:centralY, w:0, h:centralH},
-      {x:centralX+centralW, y:centralY, w:0, h:centralH}
-    ];
-    sides.forEach((side, idx) => {
-      const count = Math.round(6 + amount*16);
-      for (let i=0;i<count;i++) {
-        let cx, cy, rx, ry;
-        if (idx < 2) {
-          cx = centralX + rnd()*centralW;
-          cy = side.y + (idx === 0 ? rnd()*28 : -rnd()*28);
-          rx = 18 + rnd()*90 + amount*70;
-          ry = 4 + rnd()*16 + amount*16;
-        } else {
-          cx = side.x + (idx === 2 ? rnd()*24 : -rnd()*24);
-          cy = centralY + rnd()*centralH;
-          rx = 4 + rnd()*18 + amount*14;
-          ry = 20 + rnd()*92 + amount*78;
-        }
-        g.appendChild(svgEl("ellipse", {
-          cx:cx.toFixed(2), cy:cy.toFixed(2), rx:rx.toFixed(2), ry:ry.toFixed(2),
-          fill:rnd() < .6 ? dark : sepia,
-          opacity:(0.025 + amount*(0.04 + rnd()*0.12)).toFixed(3)
-        }));
-      }
-    });
-
-    if (amount > .35) {
-      const cornerCount = Math.round(2 + amount*8);
-      for (let i=0; i<cornerCount; i++) {
-        const corner = Math.floor(rnd()*4);
-        const x = corner % 2 === 0 ? centralX + rnd()*40 : centralX + centralW - rnd()*40;
-        const y = corner < 2 ? centralY + rnd()*46 : centralY + centralH - rnd()*46;
-        g.appendChild(svgEl("ellipse", {
-          cx:x.toFixed(2), cy:y.toFixed(2),
-          rx:(20 + rnd()*55 + amount*90).toFixed(2),
-          ry:(10 + rnd()*28 + amount*55).toFixed(2),
-          fill:paper,
-          opacity:(0.02 + amount*(0.05 + rnd()*0.14)).toFixed(3)
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addInkFailure(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 26117 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"ink failure"});
-    const paper = desaturateHex(blendHex($("paper").value, "#efe0c9", .42), .35 + amount*.18);
-    const dark = desaturateHex(blendHex($("ink").value, "#3a2413", .38), .24 + amount*.28);
-    const bandCount = Math.round(4 + amount*18);
-    for (let i=0; i<bandCount; i++) {
-      const y = centralY + rnd()*centralH;
-      g.appendChild(svgEl("ellipse", {
-        cx:(centralX + rnd()*centralW).toFixed(2), cy:y.toFixed(2),
-        rx:(14 + rnd()*110 + amount*120).toFixed(2),
-        ry:(3 + rnd()*16 + amount*18).toFixed(2),
-        fill:paper,
-        opacity:(0.02 + amount*(0.04 + rnd()*0.15)).toFixed(3)
-      }));
-      if (rnd() < .35) {
-        g.appendChild(svgEl("line", {
-          x1:(centralX + rnd()*centralW).toFixed(2), y1:(y + (rnd()-.5)*6).toFixed(2),
-          x2:(centralX + rnd()*centralW).toFixed(2), y2:(y + (rnd()-.5)*6 + 18 + rnd()*44).toFixed(2),
-          stroke:dark,
-          "stroke-width":(0.4 + rnd()*1.1).toFixed(2),
-          opacity:(0.015 + amount*(0.03 + rnd()*0.08)).toFixed(3),
-          "stroke-linecap":"round"
-        }));
-      }
-    }
-    artwork.appendChild(g);
   }
 
   function addPaperTexture(amount, centralX, centralY, centralW, centralH) {
@@ -1628,129 +607,11 @@
     artwork.appendChild(g);
   }
 
-  function addFoxing(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 2811 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"foxing and stains"});
-    const stain = desaturateHex(blendHex($("frame").value, "#8b5f33", .55), .32 + amount*.26);
-    const darkStain = desaturateHex(blendHex($("ink").value, "#3d2714", .72), .24 + amount*.32);
-    const count = Math.round(5 + Math.pow(amount, 1.14) * 30);
-    for (let i=0; i<count; i++) {
-      const edgeBias = rnd() < .66;
-      const cx = edgeBias ? (rnd() < .5 ? centralX + rnd()*65 : centralX + centralW - rnd()*65) : centralX + rnd()*centralW;
-      const cy = edgeBias ? (rnd() < .5 ? centralY + rnd()*76 : centralY + centralH - rnd()*76) : centralY + rnd()*centralH;
-      const cluster = 3 + Math.floor(rnd()*(4 + amount*5));
-      for (let j=0; j<cluster; j++) {
-        const x = cx + (rnd()-.5) * (20 + amount*80);
-        const y = cy + (rnd()-.5) * (16 + amount*54);
-        g.appendChild(svgEl("ellipse", {
-          cx:x.toFixed(2), cy:y.toFixed(2),
-          rx:(3 + rnd()*18 + amount*26).toFixed(2),
-          ry:(2 + rnd()*12 + amount*16).toFixed(2),
-          fill:rnd() < .68 ? stain : darkStain,
-          opacity:(0.03 + amount*(0.04 + rnd()*0.16)).toFixed(3)
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addAbrasion(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 3911 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"abrasion and scratches"});
-    const ink = $("ink").value;
-    const paper = $("paper").value;
-    const count = Math.round(14 + Math.pow(amount, 1.22) * 230);
-    for (let i=0; i<count; i++) {
-      const x = centralX + rnd()*centralW;
-      const y = centralY + rnd()*centralH;
-      if (rnd() < .72) {
-        const len = 2 + rnd()*(8 + amount*34);
-        g.appendChild(svgEl("line", {
-          x1:x.toFixed(2), y1:y.toFixed(2),
-          x2:(x+len).toFixed(2), y2:(y+(rnd()-.5)*4.2).toFixed(2),
-          stroke:rnd() < .58 ? paper : ink,
-          "stroke-width":(0.45 + rnd()*1.55).toFixed(2),
-          "stroke-linecap":"round",
-          opacity:(0.02 + amount*(0.035 + rnd()*0.12)).toFixed(3)
-        }));
-      } else {
-        g.appendChild(svgEl("path", {
-          d:`M ${x.toFixed(2)} ${y.toFixed(2)} q ${(rnd()*12-6).toFixed(2)} ${(rnd()*10-5).toFixed(2)} ${(rnd()*22-11).toFixed(2)} ${(rnd()*16-8).toFixed(2)}`,
-          fill:"none", stroke:rnd() < .52 ? ink : paper,
-          "stroke-width":(0.45 + rnd()*1.4).toFixed(2),
-          opacity:(0.018 + amount*(0.03 + rnd()*0.09)).toFixed(3),
-          "stroke-linecap":"round"
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addErosion(amount, centralX, centralY, centralW, centralH) {
-    if (amount <= 0) return;
-    const rnd = seededRandom(layoutSeed + 5123 + Math.floor(amount*100));
-    const g = svgEl("g", {"aria-label":"paper loss and erosion"});
-    const paper = desaturateHex(blendHex($("paper").value, "#eee0c9", .48), .28 + amount*.18);
-    const rawEdge = desaturateHex(blendHex($("frame").value, "#604021", .74), .24 + amount*.32);
-    const shadow = desaturateHex(blendHex($("ink").value, "#20120a", .84), .18 + amount*.24);
-    const clusterCount = Math.round(2 + Math.pow(amount, 1.2) * 14);
-
-    for (let i=0; i<clusterCount; i++) {
-      const edgeBias = rnd() < .82;
-      let cx = centralX + rnd()*centralW;
-      let cy = centralY + rnd()*centralH;
-      if (edgeBias) {
-        const side = Math.floor(rnd()*4);
-        if (side === 0) { cx = centralX + rnd()*centralW; cy = centralY + rnd()*36; }
-        if (side === 1) { cx = centralX + rnd()*centralW; cy = centralY + centralH - rnd()*36; }
-        if (side === 2) { cx = centralX + rnd()*30; cy = centralY + rnd()*centralH; }
-        if (side === 3) { cx = centralX + centralW - rnd()*30; cy = centralY + rnd()*centralH; }
-      }
-      const pieces = 5 + Math.floor(rnd()*(5 + amount*7));
-      for (let j=0; j<pieces; j++) {
-        const x = cx + (rnd()-.5) * (26 + amount*120);
-        const y = cy + (rnd()-.5) * (20 + amount*80);
-        const rx = 4 + rnd()*18 + amount*28;
-        const ry = 2 + rnd()*10 + amount*16;
-        g.appendChild(svgEl("ellipse", {
-          cx:x.toFixed(2), cy:y.toFixed(2),
-          rx:rx.toFixed(2), ry:ry.toFixed(2),
-          fill:rnd() < .76 ? paper : rawEdge,
-          opacity:(0.045 + amount*(0.08 + rnd()*0.18)).toFixed(3)
-        }));
-        if (rnd() < .46) {
-          g.appendChild(svgEl("ellipse", {
-            cx:(x + (rnd()-.5)*4).toFixed(2), cy:(y + (rnd()-.5)*4).toFixed(2),
-            rx:(rx*.75).toFixed(2), ry:(ry*.75).toFixed(2),
-            fill:shadow,
-            opacity:(0.018 + amount*(0.03 + rnd()*0.08)).toFixed(3)
-          }));
-        }
-      }
-    }
-
-    if (amount > .45) {
-      const veilCount = Math.round(1 + amount*6);
-      for (let i=0; i<veilCount; i++) {
-        g.appendChild(svgEl("ellipse", {
-          cx:(centralX + rnd()*centralW).toFixed(2), cy:(centralY + rnd()*centralH).toFixed(2),
-          rx:(22 + rnd()*110 + amount*120).toFixed(2),
-          ry:(7 + rnd()*34 + amount*40).toFixed(2),
-          fill:paper,
-          opacity:(Math.max(0, amount-.36) * (.09 + rnd()*0.16)).toFixed(3)
-        }));
-      }
-    }
-    artwork.appendChild(g);
-  }
-
-  function addSpecks(amount, centralX, centralY, centralW, centralH) {
+  function addAging(amount, centralX, centralY, centralW, centralH) {
     // Stronger, clearly visible aging: pinholes, freckles, scratches and occasional larger foxing spots.
     if (amount <= 0) return;
     const rnd = seededRandom(layoutSeed + Math.round(amount * 1000) * 31 + 991);
-    const g = svgEl("g", {"aria-label":"specks and freckles"});
+    const g = svgEl("g", {"aria-label":"aging marks and specks"});
     const ink = $("ink").value;
     const count = Math.round(38 + Math.pow(amount, 1.25) * 620);
 
@@ -1799,305 +660,6 @@
       }
     }
     artwork.appendChild(g);
-  }
-
-
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-  const lerp = (a, b, t) => a + (b - a) * t;
-
-  function hashText(str) {
-    let h = 2166136261;
-    for (let i=0; i<str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
-    return h >>> 0;
-  }
-
-  function splitTitle(title) {
-    const clean = String(title || "UNTITLED").replace(/_/g, " ").replace(/\s+/g, " ").trim();
-    if (clean.length <= 18) return [clean, "", ""];
-    const words = clean.split(" ");
-    const lineCount = clean.length > 34 ? 3 : 2;
-    const lines = Array(lineCount).fill("");
-    words.forEach(word => {
-      let best = 0;
-      for (let i=1; i<lineCount; i++) if (lines[i].length < lines[best].length) best = i;
-      lines[best] = (lines[best] + " " + word).trim();
-    });
-    return [lines[0] || "", lines[1] || "", lines[2] || ""];
-  }
-
-  function formatUTC(ts) {
-    const d = ts ? new Date(ts * 1000) : new Date();
-    return d.toLocaleString("en-GB", {day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false, timeZone:"UTC"}).toUpperCase() + " UTC";
-  }
-
-  function changeDelta(change) {
-    const oldLen = Number(change?.length?.old);
-    const newLen = Number(change?.length?.new);
-    if (Number.isFinite(oldLen) && Number.isFinite(newLen)) return newLen - oldLen;
-    return 0;
-  }
-
-  function editorClass(change) {
-    if (change?.bot) return "AUTOMATED EDITOR";
-    const user = String(change?.user || "");
-    if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(user) || user.includes(":")) return "ANONYMOUS EDITOR";
-    return "REGISTERED EDITOR";
-  }
-
-  function cleanDiffText(text) {
-    return String(text || "")
-      .replace(/\u00a0/g, " ")
-      .replace(/\s+/g, " ")
-      .replace(/^[-+\s]+|[-+\s]+$/g, "")
-      .trim();
-  }
-
-  function compactFragments(items, limit=10) {
-    const seen = new Set();
-    const out = [];
-    for (const raw of items) {
-      const value = cleanDiffText(raw);
-      if (!value || seen.has(value)) continue;
-      seen.add(value);
-      out.push(value.length > 120 ? value.slice(0,117).trimEnd() + "…" : value);
-      if (out.length >= limit) break;
-    }
-    return out;
-  }
-
-  function extractDiffFragments(html) {
-    if (!html) return {added:[], removed:[]};
-    const doc = new DOMParser().parseFromString(`<table><tbody>${html}</tbody></table>`, "text/html");
-
-    const collect = (lineSelector, preferredSelector) => {
-      const values = [];
-      doc.querySelectorAll(lineSelector).forEach(line => {
-        const preferred = [...line.querySelectorAll(preferredSelector)];
-        if (preferred.length) preferred.forEach(n => values.push(n.textContent));
-        else values.push(line.textContent);
-      });
-      return compactFragments(values);
-    };
-
-    return {
-      added: collect(".diff-addedline", "ins, .diffchange-inline"),
-      removed: collect(".diff-deletedline", "del, .diffchange-inline")
-    };
-  }
-
-  function diffWords(fragments, maxWords=18) {
-    const words = [];
-    for (const fragment of fragments) {
-      const matches = fragment.match(/[\p{L}\p{N}][\p{L}\p{N}'’\-]*/gu) || [];
-      for (const word of matches) {
-        if (word.length < 2) continue;
-        words.push(word);
-        if (words.length >= maxWords) return words;
-      }
-    }
-    return words;
-  }
-
-  function renderDiffLens() {
-    $("diffStatus").textContent = currentDiff.status;
-    const fill = (id, items, removed=false) => {
-      const box = $(id);
-      box.innerHTML = "";
-      if (!items.length) {
-        const empty = document.createElement("span");
-        empty.className = "diff-empty";
-        empty.textContent = currentDiff.status.startsWith("Loading") ? "reading revision…" : "no changed fragment found";
-        box.appendChild(empty);
-        return;
-      }
-      items.slice(0,6).forEach(value => {
-        const line = document.createElement("span");
-        line.className = "diff-snippet";
-        const parts = String(value).split(/(\s+)/);
-        parts.forEach(part => {
-          if (!part.trim()) { line.appendChild(document.createTextNode(part)); return; }
-          const clean = part.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}'’\-]+$/gu, "");
-          const token = document.createElement("span");
-          token.textContent = part;
-          if (clean.length >= 3) {
-            token.className = "diff-token";
-            token.title = `${removed ? "Restore removed" : "Inspect added"} word in the poster`;
-            token.addEventListener("mouseenter", () => {
-              token.classList.add("inspecting");
-              spawnForensicBurst(clean, removed ? "removed" : "added");
-            });
-            token.addEventListener("mouseleave", () => {
-              token.classList.remove("inspecting");
-            });
-          }
-          line.appendChild(token);
-        });
-        box.appendChild(line);
-      });
-    };
-    fill("addedDiff", currentDiff.added);
-    fill("removedDiff", currentDiff.removed, true);
-  }
-
-  async function fetchRevisionDiff(change) {
-    const newRev = Number(change?.revision?.new || change?.rev_id || 0);
-    const oldRev = Number(change?.revision?.old || change?.old_revid || 0);
-    const key = `${oldRev}:${newRev}:${change?.title || ""}`;
-    const serial = ++diffRequestSerial;
-    currentDiff = {added:[], removed:[], status:"Loading actual edit…", key};
-    renderDiffLens();
-
-    if (!newRev) {
-      currentDiff.status = "Revision text unavailable";
-      renderDiffLens();
-      return;
-    }
-
-    try {
-      const params = new URLSearchParams({
-        action:"compare",
-        format:"json",
-        origin:"*",
-        prop:"diff|ids|title|user|comment",
-        torev:String(newRev)
-      });
-      if (oldRev) params.set("fromrev", String(oldRev));
-      else {
-        params.set("fromrev", String(newRev));
-        params.set("torelative", "prev");
-        params.delete("torev");
-      }
-
-      const response = await fetch(`${COMPARE_API}?${params.toString()}`, {headers:{"Accept":"application/json"}});
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      if (serial !== diffRequestSerial || key !== `${Number(currentChange?.revision?.old || currentChange?.old_revid || 0)}:${Number(currentChange?.revision?.new || currentChange?.rev_id || 0)}:${currentChange?.title || ""}`) return;
-
-      const body = data?.compare?.body || data?.compare?.["*"] || "";
-      let parsed = extractDiffFragments(body);
-      // For a page's first revision, compare-to-prev may describe the direction in reverse.
-      if (!oldRev && change?.type === "new") parsed = {added:parsed.removed.length ? parsed.removed : parsed.added, removed:[]};
-      currentDiff = {
-        ...parsed,
-        status:`${diffWords(parsed.added,99).length} added · ${diffWords(parsed.removed,99).length} removed`,
-        key
-      };
-      renderDiffLens();
-      render();
-    } catch (err) {
-      if (serial !== diffRequestSerial) return;
-      currentDiff = {added:[], removed:[], status:"Detailed diff unavailable", key};
-      renderDiffLens();
-      render();
-    }
-  }
-
-  function applyLiveDesign(change) {
-    if (!change) return;
-    const influence = Number($("dataInfluence").value) / 100;
-    const delta = changeDelta(change);
-    const absDelta = Math.abs(delta);
-    const magnitude = clamp(Math.log1p(absDelta) / Math.log1p(3500), 0, 1);
-    const direction = Math.tanh(delta / 650);
-    const now = Date.now();
-    recentEventTimes = recentEventTimes.filter(t => now - t <= 30000);
-    const velocity = clamp(recentEventTimes.length / 75, 0, 1);
-    const age = clamp(totalLiveEvents / 140, 0, 1);
-    liveVisual = {magnitude, direction, velocity, age};
-
-    // Data targets stay inside the carefully designed slider ranges.
-    const targets = {
-      scale: 85 + 40 * magnitude,
-      tracking: 107.5 + 37.5 * direction,
-      frameSize: 100 + 68 * velocity,
-      frameTexture: 12 + 88 * velocity,
-      texture: 12 + 88 * clamp(age*.72 + velocity*.34, 0, 1),
-      specks: 8 + 92 * clamp(age*.86, 0, 1),
-      foxing: 4 + 96 * clamp(age*.78 + velocity*.16, 0, 1),
-      abrasion: 3 + 97 * clamp(age*.72 + magnitude*.22, 0, 1),
-      erosion: 0 + 100 * clamp(Math.max(0, age-.26)*1.38, 0, 1)
-    };
-    Object.entries(targets).forEach(([id, target]) => {
-      $(id).value = Math.round(lerp(manualStructuralDefaults[id], target, influence));
-    });
-
-    // Additions warm/advance the selected hue slightly; removals cool/retreat it.
-    // Large edits also darken the whole calibrated family together.
-    livePaletteShift.hue = direction * 8;
-    livePaletteShift.darkness = magnitude;
-
-    // Data chooses a composition, but the user's Generate button can reinterpret it.
-    if (absDelta > 1600) compositionMode = 5;          // Expanded field
-    else if (delta < -650) compositionMode = 6;       // Compressed core
-    else if (change.minor) compositionMode = 1;       // High cluster
-    else compositionMode = hashText(String(change.title || "")) % compositionNames.length;
-
-    const [a,b,c] = splitTitle(change.title);
-    $("intro").value = change.type === "new" ? "A NEW ENTRY" : change.minor ? "A MINOR REVISION" : "A LIVE REVISION";
-    $("title1").value = a;
-    $("title2").value = b;
-    $("title3").value = c;
-    $("subtitle").value = delta === 0 ? "A RECORDED CHANGE" : `${Math.abs(delta).toLocaleString()} CHARACTERS ${delta > 0 ? "ADDED" : "REMOVED"}`;
-    $("attrib").value = "EDITED BY";
-    $("person").value = editorClass(change);
-    $("publisher").value = "EN.WIKIPEDIA.ORG";
-    $("location").value = formatUTC(change.timestamp);
-
-    $("liveArticle").textContent = change.title || "Untitled";
-    $("liveEditor").textContent = change.user || "Unknown";
-    $("liveDelta").textContent = delta === 0 ? "changed" : `${delta > 0 ? "+" : ""}${delta.toLocaleString()} chars`;
-    $("liveVelocity").textContent = String(recentEventTimes.length);
-    $("liveCount").textContent = `${totalLiveEvents.toLocaleString()} edits`;
-    $("liveMode").textContent = compositionNames[compositionMode];
-    const articleURL = `https://en.wikipedia.org/wiki/${encodeURIComponent(String(change.title || "").replace(/ /g,"_"))}`;
-    $("articleLink").href = articleURL;
-    extremeSummary = "live data";
-    render();
-  }
-
-  function commitPendingChange() {
-    if ($("pauseLive").checked || !pendingChange) return;
-    const now = Date.now();
-    if (now - lastCommitAt < 1400) return;
-    if (currentChange || $("title1").value || $("title2").value) snapshotPosterIntoHistory("live");
-    currentChange = pendingChange;
-    pendingChange = null;
-    lastCommitAt = now;
-    kickPosterTransition();
-    triggerRevisionPulse();
-    applyLiveDesign(currentChange);
-    fetchRevisionDiff(currentChange);
-  }
-
-  function connectStream() {
-    if (eventSource) eventSource.close();
-    $("streamStatus").textContent = "Connecting to recent changes…";
-    $("streamDot").className = "status-dot";
-    eventSource = new EventSource(STREAM_URL);
-    eventSource.onopen = () => {
-      $("streamStatus").textContent = "Live · English Wikipedia";
-      $("streamDot").className = "status-dot live";
-    };
-    eventSource.onerror = () => {
-      $("streamStatus").textContent = "Stream reconnecting…";
-      $("streamDot").className = "status-dot error";
-    };
-    eventSource.onmessage = (event) => {
-      try {
-        const change = JSON.parse(event.data);
-        if (change?.meta?.domain === "canary") return;
-        if (change.server_name !== "en.wikipedia.org") return;
-        if (Number(change.namespace) !== 0) return;
-        if (!['edit','new'].includes(change.type)) return;
-        totalLiveEvents++;
-        recentEventTimes.push(Date.now());
-        recentEventTimes = recentEventTimes.filter(t => Date.now() - t <= 30000);
-        $("liveVelocity").textContent = String(recentEventTimes.length);
-        $("liveCount").textContent = `${totalLiveEvents.toLocaleString()} edits`;
-        pendingChange = change;
-        commitPendingChange();
-      } catch (_) {}
-    };
   }
 
   function fitText(el, maxWidth, minSize) {
@@ -2186,158 +748,23 @@
     };
   }
 
-  function addRevisionEchoes(cx, cy, cw, ch) {
-    const strength = Number($("echoStrength").value || 0) / 100;
-    if (strength <= 0 || (!currentDiff.added.length && !currentDiff.removed.length)) return;
-
-    const paused = $("pauseLive").checked;
-    const added = diffWords(currentDiff.added, paused ? 12 : 7);
-    const removed = diffWords(currentDiff.removed, paused ? 12 : 7);
-    if (!added.length && !removed.length) return;
-
-    const rnd = seededRandom(layoutSeed + 4409 + hashText(currentDiff.key || "diff"));
-    const g = svgEl("g", {"aria-label":"actual revision word echoes"});
-    const ink = $("ink").value;
-    const baseOpacity = strength * (paused ? .52 : .23);
-    const fontSize = paused ? 12.5 : 10.5;
-    const leftX = cx + cw * .085;
-    const rightX = cx + cw * .915;
-    const top = cy + ch * .42;
-    const bottom = cy + ch * .79;
-
-    const label = (text, x, anchor) => {
-      if (!paused) return;
-      g.appendChild(svgEl("text", {
-        x, y:top - 25, "text-anchor":anchor,
-        "font-family":familyName(), "font-size":9, "letter-spacing":".20em",
-        fill:ink, opacity:(baseOpacity*.75).toFixed(3)
-      }, text));
-    };
-    label("REMOVED", leftX, "start");
-    label("ADDED", rightX, "end");
-
-    const place = (words, x, anchor, removedFlag) => {
-      const count = Math.max(words.length, 1);
-      words.forEach((word, i) => {
-        const y = top + (bottom-top) * ((i + .5) / count) + (rnd()-.5)*10;
-        const t = svgEl("text", {
-          x, y, "text-anchor":anchor,
-          "font-family":familyName(),
-          "font-size":(fontSize + rnd()*2.2).toFixed(2),
-          "font-style": rnd() < .17 ? "italic" : "normal",
-          "letter-spacing":`${(.07 + rnd()*.09).toFixed(3)}em`,
-          fill:ink,
-          opacity:(baseOpacity * (.52 + rnd()*.48)).toFixed(3),
-          "text-decoration": removedFlag ? "line-through" : "none"
-        }, word);
-        g.appendChild(t);
-      });
-    };
-
-    place(removed, leftX, "start", true);
-    place(added, rightX, "end", false);
-    artwork.appendChild(g);
-  }
-
-  function kickPosterTransition() {
-    posterShell.classList.add("refreshing");
-    clearTimeout(kickPosterTransition._t);
-    kickPosterTransition._t = setTimeout(() => posterShell.classList.remove("refreshing"), 320);
-  }
-
-  function currentPosterSignature() {
-    return [
-      $("title1").value,
-      $("title2").value,
-      $("title3").value,
-      $("subtitle").value,
-      $("person").value,
-      compositionMode,
-      layoutSeed
-    ].join("|");
-  }
-
-  function snapshotPosterIntoHistory(reason = "") {
-    if (!artwork.children.length) return;
-    const signature = `${reason}|${currentPosterSignature()}`;
-    if (signature === lastHistorySignature) return;
-    const svg = $("poster").cloneNode(true);
-    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    const markup = new XMLSerializer().serializeToString(svg);
-    const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`;
-    historyPages.unshift({ url, signature, createdAt: Date.now() });
-    historyPages = historyPages.slice(0, 5);
-    lastHistorySignature = signature;
-    renderHistoryPages();
-  }
-
-  function renderHistoryPages() {
-    historyStack.innerHTML = "";
-    const currentVolumeAge = volumeAgeScore();
-    const count = Math.min(historyPages.length, 4);
-    const presets = [
-      {x:-6.8, y:1.8, r:-4.2, s:.98, o:.28},
-      {x:6.2, y:4.0, r:3.2, s:.975, o:.20},
-      {x:-1.5, y:7.2, r:-1.7, s:.97, o:.14},
-      {x:8.4, y:9.4, r:4.6, s:.965, o:.09}
-    ];
-    for (let i = count - 1; i >= 0; i--) {
-      const item = historyPages[i];
-      const p = presets[i] || presets[presets.length - 1];
-      const page = document.createElement("div");
-      page.className = "history-page";
-      const oldPageFade = Math.max(.28, 1 - currentVolumeAge * .10);
-      page.style.opacity = String(p.o * oldPageFade);
-      page.style.transform = `translate(${p.x}%, ${p.y}%) rotate(${p.r}deg) scale(${p.s})`;
-      page.style.filter = `blur(${(i*0.55 + Math.min(2.2,currentVolumeAge*.18)).toFixed(2)}px) saturate(${Math.max(.28,.82-currentVolumeAge*.08).toFixed(2)}) sepia(${Math.min(.42,currentVolumeAge*.08).toFixed(2)})`;
-
-      const sheet = document.createElement("div");
-      sheet.className = "history-sheet";
-      sheet.style.backgroundImage = `url("${item.url}")`;
-      page.appendChild(sheet);
-      historyStack.appendChild(page);
-    }
-  }
-
   function render() {
     artwork.innerHTML = "";
-    const volumeAge = volumeAgeScore();
-    const fadePhase = Math.max(0, volumeAge - .65);
-    sessionTextLegibility = Math.max(.018, 1 - fadePhase * .26 - Math.max(0, volumeAge - 1.8) * .045);
-    $("volumeAge").textContent = volumeAgeLabel(volumeAge);
     calibratePalette();
-    applyAgePaletteDrift(volumeAge);
-    computeVariableAxes();
     $("scaleOut").value = `${$("scale").value}%`;
     $("trackingOut").value = `${$("tracking").value}%`;
     $("frameSizeOut").value = $("frameSize").value;
     $("frameTextureOut").value = $("frameTexture").value;
     $("textureOut").value = $("texture").value;
-    $("specksOut").value = $("specks").value;
-    $("foxingOut").value = $("foxing").value;
-    $("abrasionOut").value = $("abrasion").value;
-    $("erosionOut").value = $("erosion").value;
-    $("dataInfluenceOut").value = `${$("dataInfluence").value}%`;
-    $("echoStrengthOut").value = `${$("echoStrength").value}%`;
-    $("decayTempoOut").value = `${$("decayTempo").value}%`;
-    $("typeInfluenceOut").value = `${$("typeInfluence").value}%`;
-    $("motionInfluenceOut").value = `${$("motionInfluence").value}%`;
-    const kp = kineticProfile();
-    $("resetPulseReadout").textContent = `${kp.resetDuration.toFixed(2)}s`;
-    $("ghostCycleReadout").textContent = `${kp.ghostDuration.toFixed(1)}s`;
-    $("motionModeReadout").textContent = forensicOverride ? "forensic" : (revisionPulseActive ? "re-setting" : "settled");
-    $("variationStatus").textContent = `Composition: ${compositionNames[compositionMode]}${extremeSummary ? ` · ${extremeSummary}` : ""}`;
-    $("liveMode").textContent = compositionNames[compositionMode];
+    $("agingOut").value = $("aging").value;
+    $("variationStatus").textContent = `Composition: ${compositionNames[compositionMode]}${extremeSummary ? ` · pushed: ${extremeSummary}` : ""}`;
 
     const frameSize = Number($("frameSize").value);
     const scale = Number($("scale").value) / 100;
     const track = Number($("tracking").value) / 100;
     const frameTexture = Number($("frameTexture").value) / 100;
     const texture = Number($("texture").value) / 100;
-    const specks = Number($("specks").value) / 100;
-    const foxing = Number($("foxing").value) / 100;
-    const abrasion = Number($("abrasion").value) / 100;
-    const erosion = Number($("erosion").value) / 100;
+    const aging = Number($("aging").value) / 100;
     const cx = frameSize;
     const cy = frameSize * 1.06;
     const cw = 1015 - frameSize * 2;
@@ -2384,13 +811,6 @@
     // Add editable vector fibres on top of the continuous grain.
     addPaperTexture(texture, cx, cy, cw, ch);
 
-    // One meaningful changed word becomes a large variable-type palimpsest behind the formal title page.
-    addSemanticWatermark(cx, cy, cw, ch);
-
-    // The actual words changed in the current revision become restrained marginal traces.
-    // When paused, they become more legible so the data can be inspected rather than merely felt.
-    addRevisionEchoes(cx, cy, cw, ch);
-
     // Type sizes derived from T ≈ 16 px on the 1500px canvas, then scaled for the browser preview.
     const T = 16.2 * scale;
     const title1Size = 2.0 * T;
@@ -2408,16 +828,15 @@
     const hasTitle3 = $("title3").value.trim() !== "";
 
     // Divider dimensions remain tiny and typographic, but vary enough to become part of the composition.
-    const dataLineBoost = 1 + liveVisual.magnitude * (Number($("dataInfluence").value)/100) * 1.25;
-    const divider1W = (15 + rnd() * 23) * dataLineBoost;
-    const divider2W = (13 + rnd() * 21) * dataLineBoost;
+    const divider1W = 15 + rnd() * 23;
+    const divider2W = 13 + rnd() * 21;
 
     const nodes = [];
     nodes.push([textNode($("intro").value, plan.introY + microY(), introSize, .11*track, true, .80, {x:plan.introX}), cw*.72, 15]);
-    nodes.push([variableTitleNode($("title1").value.toUpperCase(), plan.t1Y + microY(), title1Size, .13*track, .86, {x:plan.titleX}), cw*.76, 18]);
-    nodes.push([variableTitleNode($("title2").value.toUpperCase(), plan.t2Y + microY(), title2Size, .14*track, .86, {x:plan.titleX}), cw*.76, 17]);
+    nodes.push([textNode($("title1").value.toUpperCase(), plan.t1Y + microY(), title1Size, .13*track, false, .86, {x:plan.titleX}), cw*.76, 18]);
+    nodes.push([textNode($("title2").value.toUpperCase(), plan.t2Y + microY(), title2Size, .14*track, false, .86, {x:plan.titleX}), cw*.76, 17]);
     if (hasTitle3) {
-      nodes.push([variableTitleNode($("title3").value.toUpperCase(), plan.t3Y + microY(), title3Size, .15*track, .84, {x:plan.titleX}), cw*.76, 16]);
+      nodes.push([textNode($("title3").value.toUpperCase(), plan.t3Y + microY(), title3Size, .15*track, false, .84, {x:plan.titleX}), cw*.76, 16]);
     }
     nodes.push([textNode($("subtitle").value.toUpperCase(), plan.subtitleY + (hasTitle3 ? ch*.025 : 0) + microY(), subSize, .19*track, false, .82, {x:plan.subtitleX}), cw*.82, 14]);
 
@@ -2445,32 +864,16 @@
     nodes.push([textNode($("publisher").value.toUpperCase(), plan.publisherY + microY(), pubSize, .22*track, false, .77, {x:plan.footerX}), cw*.67, 12]);
     nodes.push([textNode($("location").value.toUpperCase(), plan.locationY + microY(), pubSize*.92, .25*track, false, .78, {x:plan.footerX}), cw*.57, 11]);
 
-    // Degradation is now diversified into separate families so the page can move from lightly handled
-    // to heavily ruined with more nuance than a single aging slider could provide.
-    addFoxing(foxing, cx, cy, cw, ch);
-    addAbrasion(abrasion, cx, cy, cw, ch);
-    addSpecks(specks, cx, cy, cw, ch);
-    addErosion(erosion, cx, cy, cw, ch);
-    // Session decay compounds these effects and can drive the page toward the one-month ruin state quickly.
-    addSessionDecay(volumeAge, cx, cy, cw, ch);
-
-    // Forensic inspection sits above accumulated damage: hovering a Revision Lens word
-    // temporarily restores that exact word to the surface of the archive.
-    addForensicRestorationOverlay(cx, cy, cw, ch);
-    // A transparent top-layer hit target lets the faint background ghost word itself be hovered.
-    addSemanticHoverTarget();
+    // Aging is a separate layer from texture: distinct marks should become clearly visible as the slider rises.
+    addAging(aging, cx, cy, cw, ch);
 
     // Fit long lines while preserving hierarchy and generous margins.
     requestAnimationFrame(() => {
       nodes.forEach(([el, max, min]) => fitText(el, max, min));
-      previousTypeAxes = {...currentTypeAxes};
     });
   }
 
   function vary() {
-    snapshotPosterIntoHistory("variation");
-    kickPosterTransition();
-    triggerRevisionPulse();
     layoutSeed = Math.floor(Math.random() * 100000) + 1;
 
     // "Extreme within restraint": each generation deliberately pushes 2–4 structural
@@ -2482,10 +885,7 @@
       {id:"frameSize", min:95, max:170, label:"frame"},
       {id:"frameTexture", min:0, max:100, label:"frame texture"},
       {id:"texture", min:0, max:100, label:"paper texture"},
-      {id:"specks", min:0, max:100, label:"specks"},
-      {id:"foxing", min:0, max:100, label:"foxing"},
-      {id:"abrasion", min:0, max:100, label:"abrasion"},
-      {id:"erosion", min:0, max:100, label:"erosion"}
+      {id:"aging", min:0, max:100, label:"aging"}
     ];
 
     const shuffled = [...specs].sort(() => Math.random() - .5);
@@ -2515,37 +915,18 @@
     // Composition itself is now generative. Classical axis still appears occasionally,
     // but most clicks explore another disciplined paper-relative grid.
     compositionMode = Math.random() < .12 ? 0 : 1 + Math.floor(Math.random() * (compositionNames.length - 1));
-    extremeSummary = `alternate · pushed: ${pushed.join(", ")}`;
+    extremeSummary = pushed.join(", ");
     render();
   }
 
   function reset() {
-    historyPages = [];
-    lastHistorySignature = "";
-    renderHistoryPages();
     inputs.forEach(id => {
       const el = $(id);
       if (el.type === "checkbox") el.checked = defaults[id]; else el.value = defaults[id];
     });
     layoutSeed = 17;
     compositionMode = 0;
-    forensicOverride = null;
-    revisionPulseActive = false;
-    clearTimeout(revisionPulseTimer);
     extremeSummary = "";
-    livePaletteShift = {hue:0, darkness:0};
-    if (currentChange && !$("pauseLive").checked) applyLiveDesign(currentChange); else render();
-  }
-
-  function beginNewVolume() {
-    snapshotPosterIntoHistory("closing-volume");
-    volumeStartedAt = Date.now();
-    volumeStartEventCount = totalLiveEvents;
-    historyPages = [];
-    lastHistorySignature = "";
-    sessionTextLegibility = 1;
-    renderHistoryPages();
-    extremeSummary = "new volume";
     render();
   }
 
@@ -2554,14 +935,14 @@
     svg.setAttribute("width", "1015");
     svg.setAttribute("height", "1500");
     svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-    const meta = document.createComment("Generated with The Living Archive, a live Wikipedia-driven title-page generator. Install Baskervville, Cormorant Garamond, and Fraunces locally for exact editable typography in Illustrator.");
+    const meta = document.createComment("Generated with Ghost Title-Page Poster Generator. Install Baskervville or Cormorant Garamond locally for exact editable typography in Illustrator.");
     svg.insertBefore(meta, svg.firstChild);
     const data = `<?xml version="1.0" encoding="UTF-8"?>\n${new XMLSerializer().serializeToString(svg)}`;
     const blob = new Blob([data], {type:"image/svg+xml;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "living-archive-record.svg";
+    a.download = "ghost-title-page-poster.svg";
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -2585,28 +966,8 @@
   $("reset").addEventListener("click", reset);
   $("exportSvg").addEventListener("click", exportSVG);
   $("printPdf").addEventListener("click", printPoster);
-  $("reconnect").addEventListener("click", connectStream);
-  $("newVolume").addEventListener("click", beginNewVolume);
-  $("pauseLive").addEventListener("change", () => {
-    const paused = $("pauseLive").checked;
-    if (!paused) commitPendingChange();
-    $("streamStatus").textContent = paused ? "Paused display · live stream still accumulating" : "Live · English Wikipedia";
-    if (paused && currentChange && !currentDiff.key) fetchRevisionDiff(currentChange);
-    render();
-  });
-  $("dataInfluence").addEventListener("input", () => {
-    if (currentChange && !$("pauseLive").checked) applyLiveDesign(currentChange); else render();
-  });
 
-  setInterval(commitPendingChange, 500);
-  // Re-render occasionally even if no new revision is committed so time itself visibly ages the volume.
-  setInterval(() => {
-    renderHistoryPages();
-    render();
-  }, 5000);
-  renderDiffLens();
   render();
-  connectStream();
 })();
 </script>
 </body>
