@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baruch / Mission Patch V2 — Study in Motion</title>
+<style>
+:root{color-scheme:dark;--bg:#101821;--panel:#17232d;--panel2:#1d2b36;--line:#314451;--text:#eef0e9;--muted:#b0bec7;--gold:#e8ba77;--dark:#101821}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;line-height:1.42}
+button,select,input{font:inherit}button,select{cursor:pointer}
+.app{display:grid;grid-template-columns:minmax(330px,382px) 1fr;min-height:100vh}
+.sidebar{background:var(--panel);border-right:1px solid var(--line);height:100vh;overflow:auto;padding:24px 23px 36px;scrollbar-width:thin}
+.kicker{font-size:10px;letter-spacing:.23em;text-transform:uppercase;color:var(--gold);font-weight:750;margin:0 0 10px}
+h1{font-family:Georgia,serif;font-size:30px;font-weight:400;letter-spacing:-.03em;margin:0;line-height:1.13}h1 em{font-weight:400;color:var(--gold)}
+.intro{font-size:12px;color:var(--muted);margin:11px 0 22px;max-width:350px}
+.navlink{display:inline-block;text-decoration:none;color:var(--gold);border-bottom:1px solid #7f6548;font-size:11px;margin-top:12px}
+.ctrl-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0 6px}
+button{color:var(--text);background:#263744;border:1px solid #496070;border-radius:7px;padding:10px 9px;font-size:12px;transition:background .2s,border-color .2s}
+button:hover,button:focus-visible{background:#365063;border-color:var(--gold);outline:none}
+button.primary{background:var(--gold);border-color:var(--gold);color:#1c2228;font-weight:750}button.primary:hover{background:#f0ca95}
+button.wide{width:100%}.hint{font-size:11px;color:var(--muted)}
+label{display:block;font-size:11px;color:var(--muted)}
+label small{float:right;color:var(--gold);font-weight:600;font-variant-numeric:tabular-nums}
+.rowcontrol{margin:10px 0 13px}
+input[type=range]{width:100%;margin:7px 0 0;accent-color:var(--gold);height:13px}
+select{width:100%;font-size:12px;background:#111e27;color:var(--text);border:1px solid #3e5260;border-radius:6px;padding:10px 8px;margin-top:7px}
+input[type=checkbox]{accent-color:var(--gold)}
+.check{display:flex;align-items:center;gap:9px;font-size:12px;margin:8px 0;color:var(--text)}
+.group{padding:17px 0 8px;border-top:1px solid var(--line)}.group h2{font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin:0 0 11px;color:#f0dfc1}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.workspace{min-width:0;display:flex;flex-direction:column;align-items:center;padding:24px clamp(18px,3vw,48px) 40px;background:radial-gradient(circle at 50% 33%,#263848 0%,#15212d 54%,#0e161f 100%)}
+.topbar{align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:20px}
+.topbar .eyebrow{font-size:10px;color:#c1ced3;letter-spacing:.15em;text-transform:uppercase}
+.topbar .measure{font-size:11px;color:#d9c6a7;text-align:right}
+.preview-wrap{width:min(100%,625px);position:relative}
+#preview{width:100%;aspect-ratio:1;display:block;background:#f6f3ea;border:1px solid #ac9f84;box-shadow:0 25px 75px #0008}
+#preview svg{width:100%;height:100%;display:block}
+.stage-actions{display:flex;gap:9px;width:min(100%,625px);flex-wrap:wrap;margin-top:14px}
+.stage-actions button{flex:1;min-width:123px}
+.sect{width:min(100%,820px);margin-top:31px}.secthead{display:flex;justify-content:space-between;gap:14px;align-items:end;margin-bottom:13px}
+.secthead h2{font-family:Georgia,serif;font-size:23px;font-weight:400;margin:0}.secthead span{color:var(--muted);font-size:11px}
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tile{padding:6px;background:#20313d;border:1px solid #3b5361;border-radius:7px;cursor:pointer;text-align:left;color:var(--text);display:block;width:100%}
+.tile:hover{border-color:var(--gold);background:#304758}.tile.active{border:2px solid var(--gold);padding:5px}
+.tile svg{display:block;width:100%;aspect-ratio:1;background:#fff;border-radius:3px}.tile p{font-size:10px;color:#d2dbdf;margin:7px 4px 2px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.memo{background:#1d2c38;border:1px solid #3c5361;border-radius:8px;padding:16px 18px;font-size:12px;color:var(--muted)}
+.memo strong{color:#f0debc}.sketch-card{display:none;max-width:625px;width:100%;background:#1d2c38;padding:12px;border:1px solid #3c5361;border-radius:8px;margin-top:15px}.sketch-card.show{display:block}.sketch-card img{width:100%;height:auto;display:block}.sketch-card p{font-size:11px;margin:10px 0 3px;color:#c1cdd3}
+.footer{color:#91a4ae;font-size:10px;margin-top:25px;text-align:center}
+@media(max-width:970px){.app{grid-template-columns:320px 1fr}.sidebar{padding:18px 16px}.gallery{gap:8px}}
+@media(max-width:770px){.app{display:flex;flex-direction:column}.sidebar{height:auto;max-height:none;order:2;border-right:0;border-top:1px solid var(--line);padding:26px 18px}.workspace{order:1;padding:19px 14px 30px}.preview-wrap{max-width:520px}.topbar{align-items:flex-start}.gallery{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<p class="kicker">ART 3041 · SSEP · Session 3</p>
+<h1>A Study in <em>Motion</em></h1>
+<p class="intro">A shape-driven generator based on the second hand-drawn Baruch patch. Bend the two book pages, move the planets, subtract lines, and multiply stars—without ever sacrificing readable lettering.</p>
+<div class="group" style="border-top:none;padding-top:0">
+<h2>Variation engine</h2>
+<label for="preset">Starting composition</label>
+<select id="preset">
+<option value="sketch">02 · Hand-drawn sketch</option><option value="elastic">Elastic pages</option><option value="orbital">Planetary field</option><option value="spare">Sparse drawing</option><option value="starfield">Star map</option><option value="type">Typography experiment</option>
+</select>
+<div class="ctrl-actions"><button id="gentle">Gentle</button><button id="bold">Bold</button><button class="primary" id="wild">Wild</button></div>
+<p class="hint" style="margin:5px 0">Even “Wild” preserves both readable words on the book.</p>
+<button class="wide" id="reset">Return to second sketch</button>
+</div>
+<div class="group"><h2>01 — Book mechanics</h2>
+<div class="rowcontrol"><label>Book curvature <small id="curveVal"></small></label><input type="range" id="curve" min="0" max="100" step="1"></div>
+<div class="rowcontrol"><label>Spread / width <small id="spreadVal"></small></label><input type="range" id="spread" min="20" max="100"></div>
+<div class="rowcontrol"><label>Page depth <small id="depthVal"></small></label><input type="range" id="depth" min="15" max="100"></div>
+<div class="rowcontrol"><label>Book rotation <small id="tiltVal"></small></label><input type="range" id="tilt" min="-30" max="30"></div>
+<div class="pair"><div class="rowcontrol"><label>Horizontal shift <small id="bookXVal"></small></label><input id="bookX" type="range" min="-100" max="100"></div><div class="rowcontrol"><label>Vertical shift <small id="bookYVal"></small></label><input id="bookY" type="range" min="-100" max="100"></div></div>
+<div class="rowcontrol"><label>Additional page lines <small id="pageLinesVal"></small></label><input id="pageLines" type="range" min="0" max="9"></div>
+</div>
+<div class="group"><h2>02 — Orbits & linework</h2>
+<div class="rowcontrol"><label>Orbit lines <small id="orbitsVal"></small></label><input id="orbits" type="range" min="0" max="8"></div>
+<div class="rowcontrol"><label>Orbit tilt <small id="orbitTiltVal"></small></label><input id="orbitTilt" type="range" min="-70" max="70"></div>
+<div class="rowcontrol"><label>Arch segments <small id="archesVal"></small></label><input id="arches" type="range" min="0" max="5"></div>
+<div class="rowcontrol"><label>Arch shape <small id="archBendVal"></small></label><input id="archBend" type="range" min="0" max="100"></div>
+</div>
+<div class="group"><h2>03 — Celestial objects</h2>
+<div class="rowcontrol"><label>Number of planets <small id="planetsVal"></small></label><input id="planets" type="range" min="1" max="8"></div>
+<div class="rowcontrol"><label>Planet size <small id="planetSizeVal"></small></label><input id="planetSize" type="range" min="40" max="170"></div>
+<div class="rowcontrol"><label>Number of stars <small id="starsVal"></small></label><input id="stars" type="range" min="0" max="18"></div>
+<div class="rowcontrol"><label>Star size <small id="starSizeVal"></small></label><input id="starSize" type="range" min="25" max="165"></div>
+<label>Star geometry<select id="points"><option value="4">Four-point (original)</option><option value="6">Six-point</option><option value="8">Eight-point</option></select></label>
+</div>
+<div class="group"><h2>04 — Readable typography</h2>
+<label>Letterform<select id="font"><option value="condensed">Tall / hand-lettered</option><option value="serif">Academic serif</option><option value="sans">Modern sans serif</option><option value="mono">Technical monospaced</option><option value="heavy">Bold collegiate</option></select></label>
+<div class="rowcontrol"><label>Type size <small id="typeScaleVal"></small></label><input id="typeScale" type="range" min="80" max="120"></div>
+<div class="rowcontrol"><label>Letter spacing <small id="trackingVal"></small></label><input id="tracking" type="range" min="0" max="18"></div>
+<p class="hint">The text always sits in front of illustrations, inside the two book pages. No orbit or planet may cross either word.</p>
+</div>
+<div class="group"><h2>05 — Material</h2>
+<label>Color treatment<select id="palette"><option value="graphite">Graphite & paper</option><option value="blueprint">Baruch blue & ivory</option><option value="nocturne">Midnight & brass</option><option value="print">Cobalt risograph</option><option value="terracotta">Terracotta drawing</option></select></label>
+<label class="check"><input type="checkbox" id="border"> Show patch boundary</label>
+<label class="check"><input type="checkbox" id="planetDetail"> Add planetary contour lines</label>
+</div>
+<a class="navlink" href="index.html">← Return to course index</a>
+</aside>
+<main class="workspace">
+<div class="topbar"><div class="eyebrow">VERSION 02 / HAND-DRAWN FAMILY<br><span id="modeCaption">Original second sketch</span></div><div class="measure">3.5 × 3.5 in · 1400 × 1400 px PNG<br>400 pixels per inch</div></div>
+<div class="preview-wrap"><div id="preview" role="img" aria-label="Live Baruch mission patch variation"></div></div>
+<div class="stage-actions"><button class="primary" id="png">↓ Export PNG</button><button id="svg">↓ Export SVG</button><button id="save">☆ Save favorite</button><button id="showSketch">View sketch</button></div>
+<div class="sketch-card" id="sketchCard"><img src="baruch_v2_sketch_square.jpg" alt="Cropped hand-drawn second mission patch sketch with BARUCH on the upper page and COLLEGE on the lower page"><p>Second source drawing, square crop, no fingers. If viewing this HTML outside the ZIP, place the JPG beside the HTML file.</p></div>
+<section class="sect"><div class="secthead"><h2>Variation gallery</h2><span>Click a thumbnail to return to it</span></div><div class="gallery" id="gallery"></div><div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="primary" id="generateSix">Generate six new studies</button><button id="showFavorites">Show saved favorites</button><button id="clearFavorites">Clear favorites</button></div></section>
+<section class="sect"><div class="memo"><strong>Design constraints:</strong> Each study keeps a two-page book, a celestial setting, and the words <strong>BARUCH COLLEGE</strong>. The page curvature, orbit grammar, number and scale of planets, star fields, and letterforms can change radically. Both words remain centered on solid, high-contrast page surfaces.</div></section>
+<div class="footer">No images from other designers are used in generating these patches. Artwork is algorithmically drawn from the original hand-sketched forms.</div>
+</main></div>
+<script>
+(()=>{'use strict';
+const keys=['curve','spread','depth','tilt','bookX','bookY','pageLines','orbits','orbitTilt','arches','archBend','planets','planetSize','stars','starSize','points','font','typeScale','tracking','palette','border','planetDetail'];
+const $=id=>document.getElementById(id);
+const base={curve:52,spread:65,depth:58,tilt:0,bookX:0,bookY:0,pageLines:0,orbits:1,orbitTilt:-10,arches:2,archBend:50,planets:2,planetSize:100,stars:3,starSize:72,points:'4',font:'condensed',typeScale:100,tracking:4,palette:'graphite',border:false,planetDetail:false,seed:17};
+const presets={sketch:{},elastic:{curve:99,spread:94,depth:86,tilt:-7,pageLines:5,orbits:4,arches:3,planets:3,stars:5,starSize:105},orbital:{curve:61,spread:76,depth:64,orbits:7,orbitTilt:44,arches:2,planets:7,planetSize:122,stars:9,pageLines:2,palette:'blueprint'},spare:{curve:14,spread:42,depth:30,orbits:0,arches:1,planets:1,stars:1,starSize:115,font:'serif',pageLines:0},starfield:{curve:71,spread:61,depth:60,orbits:3,arches:5,planets:5,stars:18,starSize:96,palette:'nocturne',points:'8'},type:{curve:80,spread:86,depth:77,tilt:11,orbits:2,arches:2,planets:2,stars:4,font:'heavy',typeScale:116,tracking:8,planetDetail:true,palette:'print'}};
+const palette={graphite:{bg:'#f5f1e8',paper:'#fffdf7',edge:'#e4d9c4',line:'#34424c',type:'#263540',accent:'#a4754e',planet:'#ece6d9'},blueprint:{bg:'#103353',paper:'#fffaf0',edge:'#d5dfeb',line:'#e6ca99',type:'#132e4d',accent:'#e6bc70',planet:'#4e82ab'},nocturne:{bg:'#09192e',paper:'#f7ebd2',edge:'#bca97d',line:'#dfb980',type:'#142440',accent:'#f3dcad',planet:'#4c6582'},print:{bg:'#e7eef5',paper:'#fffaf7',edge:'#9baed4',line:'#163895',type:'#14347e',accent:'#e36158',planet:'#a5bde8'},terracotta:{bg:'#f4e9d9',paper:'#fff5e5',edge:'#dbbca5',line:'#884e43',type:'#6c3f33',accent:'#c58e59',planet:'#e5c4ae'}};
+const fontStack={condensed:'"Arial Narrow", "Helvetica Neue", Arial, sans-serif',serif:'Georgia,"Times New Roman",serif',sans:'Arial,Helvetica,sans-serif',mono:'"Courier New",monospace',heavy:'Impact,"Arial Black",sans-serif'};
+let current={...base}, galleryStates=[], showSaved=false, activeTile=-1;
+function clamp(n,lo,hi){return Math.max(lo,Math.min(hi,n))}
+function seeded(seed){let a=(seed>>>0)||1;return()=>{a=(Math.imul(1664525,a)+1013904223)>>>0;return a/4294967296}}
+function star(x,y,r,pts,inner=.19,angle=-Math.PI/2){let d='';for(let i=0;i<pts*2;i++){const theta=angle+i*Math.PI/pts,rad=i%2? r*inner:r;d+=(i?'L':'M')+(x+Math.cos(theta)*rad).toFixed(2)+' '+(y+Math.sin(theta)*rad).toFixed(2)+' '}return d+'Z'}
+function esc(str){return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]))}
+function svgFor(s, label='Baruch College mission patch'){
+ const p=palette[s.palette]||palette.graphite;
+ const rng=seeded(s.seed),cv=s.curve-50,d=s.depth-50;
+ const w=s.spread/65, scX=clamp(.58+w*.42,.7,1.28);
+ const bscale=clamp(0.92+(s.depth-58)*.0018,.81,1.04);
+ let html=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1000 1000" width="1000" height="1000" role="img" aria-label="${esc(label)}"><rect x="0" y="0" width="1000" height="1000" fill="${p.bg}"/>`;
+ if(s.border)html+=`<rect x="42" y="42" width="916" height="916" rx="180" fill="none" stroke="${p.line}" opacity=".8" stroke-width="5"/><rect x="60" y="60" width="880" height="880" rx="167" fill="none" stroke="${p.line}" opacity=".26" stroke-width="2"/>`;
+ const stroke=p.line;const sw=3.7;
+ // Early background rings never touch the book text: the book is drawn on top.
+ const arcPaths=[`M 324 ${302+cv*.26} C ${344-cv*.4} ${136-cv*.3} 526 ${176+cv*.1} 658 ${212+cv*.24} C 735 238 751 287 730 332`,
+ `M 262 585 C 135 674 123 827 233 831 C 265 840 286 828 294 815`,
+ `M 796 520 Q 860 591 825 706 Q 793 777 767 798`,
+ `M 158 476 C 308 169 705 142 876 432`,
+ `M 205 775 C 277 942 702 938 870 656`,
+ `M 112 605 C 244 290 818 264 900 515`];
+ for(let i=0;i<s.arches;i++){const q=(i+Math.round(s.archBend/23))%arcPaths.length;html+=`<path d="${arcPaths[q]}" fill="none" stroke="${stroke}" stroke-width="${(i%2?2.5:3.8).toFixed(1)}" opacity="${i<2?.82:.44}" stroke-linecap="round"/>`}
+ for(let i=0;i<s.orbits;i++){
+ const tilt=Number(s.orbitTilt)+(i-2)*18;
+ const rx=clamp(320+i*24,290,480),ry=clamp(137+i*18,100,280);
+ const dash=i%3===0?' stroke-dasharray="370 110 300 120"':'';
+ html+=`<ellipse cx="510" cy="526" rx="${rx}" ry="${ry}" transform="rotate(${tilt} 510 526)" fill="none" stroke="${i%2?p.accent:p.line}" stroke-width="${i%2?2.3:2.8}" opacity="${i>4?.38:.57}"${dash}/>`;
+ }
+ // Planets appear as geometry, not photographs. First two retain their roles in the second sketch.
+ const celestial=[[276,453,94],[830,690,19],[675,220,34],[205,750,25],[855,387,48],[455,192,26],[136,543,23],[716,844,34]];
+ for(let i=0;i<s.planets;i++){
+ const [xx,yy,rr]=celestial[i];const off=i<2?0:(rng()-.5)*56;
+ const x=xx+off,y=yy+(i<2?0:(rng()-.5)*55),r=rr*s.planetSize/100*(i===0?1:clamp(.75+rng()*.47,.8,1.1));
+ html+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="${p.planet}" stroke="${p.line}" stroke-width="${i===0?4.1:2.9}"/>`;
+ if(s.planetDetail){for(let z=-1;z<=1;z++){let o=(z+1)*.17+.19;html+=`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${(r*(.44+z*.18)).toFixed(1)}" ry="${(r*.94).toFixed(1)}" fill="none" stroke="${p.line}" opacity="${o}" stroke-width="1.3"/>`}}
+ }
+ const stars=[[740,231,56],[278,618,18],[853,575,20],[610,170,14],[162,332,17],[890,287,12],[175,788,12],[756,806,17],[374,192,16],[803,147,10],[425,868,12],[95,521,11],[910,767,13],[580,116,9],[320,789,16],[125,225,13],[875,890,11],[670,744,15]];
+ for(let i=0;i<s.stars;i++){const [x,y,baseR]=stars[i];const rr=baseR*s.starSize/72*(i===0?1:.85+rng()*.38);html+=`<path d="${star(x,y,rr,Number(s.points),i===0?.17:.22)}" fill="${i===0?p.accent:p.paper}" stroke="${p.line}" stroke-width="${i===0?3:2}" stroke-linejoin="round"/>`}
+ // The page geometry and its typography are a single indivisible foreground layer.
+ const tx=s.bookX*.65,ty=s.bookY*.72;
+ html+=`<g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) translate(500 550) rotate(${s.tilt}) scale(${scX.toFixed(3)} ${bscale.toFixed(3)}) translate(-500 -550)">`;
+ const upperTop=325-cv*.6, upperLower=555+cv*.55;
+ const lowerTop=525-cv*.35, lowerBase=752+cv*.8;
+ // Backside and turn of the book
+ html+=`<path d="M 261 ${705+cv*.15} Q 380 ${735+cv*.32} 622 ${lowerBase+11} Q 679 ${lowerBase+45} 738 ${lowerBase+78} Q 742 710 786 615 L 699 575 Q 620 622 649 759 Q 443 737 261 ${705+cv*.15} Z" fill="${p.edge}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+ html+=`<path d="M 255 ${690+cv*.09} Q ${340-cv*.75} ${545-cv*.8} 460 ${lowerTop} Q 576 ${lowerTop+27} 688 ${580+cv*.25} Q ${638-cv*.65} ${677+cv*.4} 645 ${lowerBase+cv*.1} Q 465 ${730+cv*.44} 264 ${719+cv*.14} Q 295 ${683+cv*.11} 255 ${690+cv*.09} Z" fill="${p.paper}" stroke="${stroke}" stroke-width="${sw+1}" stroke-linejoin="round"/>`;
+ // Tiny lower edge fold, never over the letters
+ html+=`<path d="M 263 ${719+cv*.14} Q 430 ${730+cv*.25} 645 ${lowerBase+cv*.1}" fill="none" stroke="${p.accent}" stroke-width="2.4" opacity=".65"/>`;
+ // Upper page, strongly adjustable curvature
+ html+=`<path d="M 446 ${upperTop} Q 590 ${upperTop-12-cv*.15} 779 ${upperTop+19+cv*.21} Q ${771+cv*.33} ${374+cv*.15} ${699-cv*.24} ${436+cv*.25} Q ${620-cv*.56} ${515+cv*.5} 670 ${upperLower+cv*.1} Q 550 ${535+cv*.3} 440 ${542+cv*.17} Q ${411-cv*.16} ${443-cv*.2} 446 ${upperTop} Z" fill="${p.paper}" stroke="${stroke}" stroke-width="${sw+1}" stroke-linejoin="round"/>`;
+ // Right-hand curled edge behind front cover seam
+ html+=`<path d="M 779 ${upperTop+19+cv*.21} Q ${812+cv*.45} ${400+cv*.28} 823 ${443+cv*.25} Q ${745+cv*.3} ${501+cv*.42} 715 ${575+cv*.6} L 670 ${upperLower+cv*.1} Q ${625-cv*.13} ${491+cv*.3} 699 ${436+cv*.25} Q 762 ${383+cv*.23} 779 ${upperTop+19+cv*.21} Z" fill="${p.edge}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+ html+=`<path d="M 440 ${542+cv*.17} Q 551 ${535+cv*.3} 670 ${upperLower+cv*.1}" fill="none" stroke="${p.accent}" opacity=".35" stroke-width="2.5"/>`;
+ for(let i=0;i<s.pageLines;i++){
+ const u=i/Math.max(1,s.pageLines-1);
+ // Edge-of-page linework, away from the center of readable text.
+ const x=462+i*17,y=335+(i%2)*2;
+ html+=`<path d="M ${x} ${y} q ${15+cv*.08} ${-5-cv*.1} ${37+u*5} -2" stroke="${p.line}" stroke-width="1.65" opacity=".32" fill="none"/>`;
+ const ly=734+cv*.3+i*2.4;
+ html+=`<path d="M 295 ${ly} Q 452 ${ly+22+cv*.12} ${633-i*3} ${ly+18}" stroke="${stroke}" stroke-width="1.55" opacity=".23" fill="none"/>`;
+ }
+ // Both words are rendered last, on solid light-colored pages, in print-safe ink.
+ // textLength maintains each entire word inside its own page at every font/size/letterspacing setting.
+ let typeFont=fontStack[s.font]||fontStack.condensed;
+ const sizeTop=(85*s.typeScale/100).toFixed(1),sizeBottom=(78*s.typeScale/100).toFixed(1);
+ const safeTrack=(s.tracking*.28).toFixed(1);
+ html+=`<g fill="${p.type}" font-family='${esc(typeFont)}' font-weight="${s.font==='heavy'?'900':'500'}" paint-order="stroke" stroke="none">`;
+ html+=`<text x="549" y="482" text-anchor="middle" font-size="${sizeTop}" letter-spacing="${safeTrack}" textLength="184" lengthAdjust="spacingAndGlyphs">BARUCH</text>`;
+ html+=`<text x="467" y="676" text-anchor="middle" font-size="${sizeBottom}" letter-spacing="${safeTrack}" textLength="290" lengthAdjust="spacingAndGlyphs">COLLEGE</text>`;
+ html+='</g></g></svg>';
+ return html;
+}
+function updateControls(){keys.forEach(k=>{const e=$(k);if(e)e.type==='checkbox'?e.checked=!!current[k]:e.value=String(current[k]);const out=$(k+'Val');if(out)out.textContent=(k==='tilt'||k==='orbitTilt'?current[k]+'°':current[k]);})}
+function render(){updateControls();$('preview').innerHTML=svgFor(current);}
+function setState(s,label){current={...base,...s};render();$('modeCaption').textContent=label||'Custom exploration';}
+keys.forEach(k=>{const el=$(k);el.addEventListener('input',()=>{current[k]=el.type==='checkbox'?el.checked:(el.tagName==='SELECT'?el.value:Number(el.value));activeTile=-1;render();$('modeCaption').textContent='Custom / manually shaped';});});
+$('preset').addEventListener('change',()=>{const name=$('preset').value;setState({...base,...presets[name],seed:17+name.length*41},'Preset / '+$('preset').selectedOptions[0].textContent);activeTile=-1;});
+$('reset').onclick=()=>{$('preset').value='sketch';setState(base,'Original second sketch');activeTile=-1;showSaved=false;renderGallery();};
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function between(a,b){return Math.round(a+Math.random()*(b-a))}
+function randomVariation(intensity='bold',seedState=current){
+ const val={...seedState,seed:Math.floor(Math.random()*1000000)};
+ const magnitude=intensity==='gentle'?.22:intensity==='bold'?.65:1;
+ const ranges={curve:[0,100],spread:[20,100],depth:[15,100],tilt:[-30,30],bookX:[-100,100],bookY:[-100,100],pageLines:[0,9],orbits:[0,8],orbitTilt:[-70,70],arches:[0,5],archBend:[0,100],planets:[1,8],planetSize:[40,170],stars:[0,18],starSize:[25,165],typeScale:[80,120],tracking:[0,18]};
+ for(const [k,[lo,hi]]of Object.entries(ranges)){
+   const global=between(lo,hi);
+   const target=+seedState[k]+(global-Number(seedState[k]))*magnitude;
+   val[k]=clamp(Math.round(target),lo,hi);
+ }
+ if(intensity==='wild'){val.font=pick(Object.keys(fontStack));val.points=pick(['4','6','8']);val.palette=pick(Object.keys(palette));val.border=pick([false,true]);val.planetDetail=pick([false,true]);}
+ else if(intensity==='bold'){if(Math.random()<.58)val.font=pick(Object.keys(fontStack));if(Math.random()<.45)val.palette=pick(Object.keys(palette));if(Math.random()<.45)val.points=pick(['4','6','8']);}
+ return val;
+}
+function change(intensity){setState(randomVariation(intensity),intensity.toUpperCase()+' / variation');activeTile=-1;}
+$('gentle').onclick=()=>change('gentle');$('bold').onclick=()=>change('bold');$('wild').onclick=()=>change('wild');
+function renderGallery(){const el=$('gallery');el.innerHTML='';galleryStates.forEach((v,i)=>{const tile=document.createElement('button');tile.type='button';tile.className='tile'+(i===activeTile?' active':'');tile.setAttribute('aria-label','Load variation '+(i+1));tile.innerHTML=svgFor(v,'Variation '+(i+1))+`<p>${esc(v._title||'Variation '+(i+1))}</p>`;tile.onclick=()=>{activeTile=i;setState(v,v._title||('Saved study '+(i+1)));renderGallery();window.scrollTo({top:0,behavior:'smooth'});};el.appendChild(tile)});}
+function makeGallery(){showSaved=false;let v=[{...base,...presets.elastic,seed:33,_title:'01 / Elastic pages'},{...base,...presets.spare,seed:47,_title:'02 / Minimal contour'},{...base,...presets.orbital,seed:72,_title:'03 / Planetary lines'},randomVariation('wild',{...base,seed:102}),randomVariation('bold',{...base,seed:190}),randomVariation('wild',{...base,seed:338})];v.slice(3).forEach((s,i)=>s._title=`0${i+4} / Free study`);galleryStates=v;activeTile=-1;renderGallery();}
+$('generateSix').onclick=makeGallery;
+function getSaves(){try{const a=JSON.parse(localStorage.getItem('ssep-v2-sketch-saves')||'[]');return Array.isArray(a)?a:[]}catch{return []}}
+$('save').onclick=()=>{try{const saves=getSaves();saves.unshift({...current,_title:'Favorite / '+new Date().toLocaleDateString()});localStorage.setItem('ssep-v2-sketch-saves',JSON.stringify(saves.slice(0,24)));$('save').textContent='✓ Saved';setTimeout(()=>{$('save').textContent='☆ Save favorite'},1200)}catch(e){alert('Favorites require local browser storage. The generator and PNG exports work without it.')}};
+$('showFavorites').onclick=()=>{showSaved=true;galleryStates=getSaves();activeTile=-1;renderGallery();};
+$('clearFavorites').onclick=()=>{if(confirm('Clear all saved patch studies on this browser?')){try{localStorage.removeItem('ssep-v2-sketch-saves');if(showSaved){galleryStates=[];renderGallery()}}catch(e){alert('Local storage is unavailable in this preview.')}}};
+$('showSketch').onclick=()=>{$('sketchCard').classList.toggle('show');$('showSketch').textContent=$('sketchCard').classList.contains('show')?'Hide sketch':'View sketch'};
+function download(href,fn){const a=document.createElement('a');a.href=href;a.download=fn;document.body.appendChild(a);a.click();a.remove()}
+$('svg').onclick=()=>{const blob=new Blob([svgFor(current)],{type:'image/svg+xml;charset=utf-8'});const url=URL.createObjectURL(blob);download(url,'baruch-mission-v2.svg');setTimeout(()=>URL.revokeObjectURL(url),3000)};
+// Insert a PNG pHYs chunk so 1400 px is interpreted as 3.5 inches (~400 DPI).
+async function addPrintDpi(blob){
+ const src=new Uint8Array(await blob.arrayBuffer());
+ if(src.length<33||src[0]!==137||src[1]!==80) return blob;
+ const c=new Uint8Array(21),d=new DataView(c.buffer);d.setUint32(0,9);
+ c.set([112,72,89,115],4);d.setUint32(8,15748);d.setUint32(12,15748);c[16]=1;
+ let crc=0xffffffff;for(let i=4;i<17;i++){crc^=c[i];for(let b=0;b<8;b++)crc=crc&1?(crc>>>1)^0xedb88320:crc>>>1;}
+ d.setUint32(17,(crc^0xffffffff)>>>0);
+ const joined=new Uint8Array(src.length+21);joined.set(src.subarray(0,33),0);joined.set(c,33);joined.set(src.subarray(33),54);
+ return new Blob([joined],{type:'image/png'});
+}
+$('png').onclick=async()=>{const btn=$('png'),old=btn.textContent;btn.textContent='Exporting…';btn.disabled=true;
+ try{const raw=svgFor(current);const blob=new Blob([raw],{type:'image/svg+xml;charset=utf-8'}),url=URL.createObjectURL(blob);const img=new Image();await new Promise((res,rej)=>{img.onload=res;img.onerror=()=>rej(new Error('Could not render the patch.'));img.src=url});const c=document.createElement('canvas');c.width=c.height=1400;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,1400,1400);URL.revokeObjectURL(url);const out=await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('PNG unavailable')),'image/png'));const finalPng=await addPrintDpi(out);const href=URL.createObjectURL(finalPng);download(href,'baruch-mission-v2-1400x1400.png');setTimeout(()=>URL.revokeObjectURL(href),3000)}catch(e){alert('Export failed: '+e.message)}finally{btn.textContent=old;btn.disabled=false}};
+setState(base,'Original second sketch');makeGallery();
+})();
+</script>
+</body>
+</html>
