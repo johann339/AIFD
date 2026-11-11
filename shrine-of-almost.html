@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0c0b10">
+<meta name="description" content="The Shrine of Almost — an interactive digital altar for the words unsaid and the roads not taken.">
+<title>THE SHRINE OF ALMOST — A Digital Ritual</title>
+<style>
+:root{--night:#0c0b10;--ink:#110f16;--pale:#f2e8e8;--cream:#e9d8d5;--rose:#e8a1b5;--hot:#fb7ca4;--wine:#742e48;--muted:#aaa0ac;--gold:#d4b89b;--line:rgba(237,211,213,.23)}
+*,*:before,*:after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--night);color:var(--pale);font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;background:radial-gradient(ellipse 45% 48% at 73% 36%,rgba(104,41,71,.19),transparent 90%),radial-gradient(ellipse 48% 55% at 4% 92%,rgba(120,55,77,.13),transparent 80%),linear-gradient(125deg,#100e15,#0b0a0e 70%)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:15;opacity:.12;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Cpath filter='url(%23n)' opacity='.22' d='M0 0h180v180H0z'/%3E%3C/svg%3E");mix-blend-mode:screen}
+button,textarea{font:inherit}button{cursor:pointer}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--hot);outline-offset:5px}
+::selection{background:var(--wine);color:white}
+.shell{max-width:1540px;margin:auto;padding:0 clamp(25px,5.5vw,92px)}
+.topbar{height:86px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);gap:20px}
+.brand{font-size:15px;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap;font-weight:bold}
+.brand span{font-size:21px;color:var(--rose);margin-right:12px;vertical-align:-2px}
+.topbar-right{display:flex;align-items:center;gap:30px}.micro{font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;font-size:10px;letter-spacing:.25em;color:var(--muted);line-height:1.65}
+.sound{border:1px solid var(--line);color:var(--pale);background:transparent;border-radius:100px;padding:11px 18px;font-family:Arial,sans-serif;font-size:10px;letter-spacing:.12em;white-space:nowrap;transition:background .2s,border .2s}
+.sound:hover,.sound.active{background:rgba(232,161,181,.11);border-color:var(--rose)}
+.hero{display:grid;grid-template-columns:minmax(390px,.9fr) minmax(480px,1.15fr);min-height:720px;gap:clamp(16px,2.6vw,48px);align-items:center;position:relative}
+.intro{padding:85px 0 80px;position:relative;z-index:2}.eyebrow{font-family:Arial,Helvetica,sans-serif;color:var(--rose);letter-spacing:.29em;text-transform:uppercase;font-size:11px;display:flex;align-items:center;gap:14px}.eyebrow:before{content:"";width:32px;height:1px;background:var(--rose)}
+h1{font-weight:400;letter-spacing:-.065em;line-height:.89;margin:31px 0 28px;font-size:clamp(80px,8vw,145px);text-transform:uppercase}
+h1 span{display:block}h1 em{display:block;font-weight:400;text-transform:none;font-size:.94em;color:var(--rose);letter-spacing:-.095em;margin-left:.22em;position:relative}
+h1 em:after{content:"";position:absolute;bottom:-16px;left:6%;width:64%;height:1px;background:linear-gradient(90deg,var(--rose),transparent);transform:rotate(-5deg)}
+.lede{max-width:445px;color:#c4b7c2;font-size:clamp(18px,1.75vw,24px);line-height:1.52;font-weight:400;margin:40px 0 34px}
+.lede strong{color:var(--pale);font-weight:normal;font-style:italic}
+.cta{background:var(--rose);color:#21111b;border:1px solid var(--rose);padding:19px 28px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:.2em;font-weight:bold;display:inline-flex;align-items:center;justify-content:space-between;gap:48px;transition:transform .23s,background .23s,box-shadow .23s}
+.cta:hover{background:#f4bbcb;transform:translateY(-3px);box-shadow:0 14px 35px rgba(232,161,181,.17)}.cta .arrow{font-size:22px;font-weight:normal;line-height:.6}
+.aside-note{display:flex;align-items:center;gap:14px;margin-top:44px;color:var(--muted);font-family:Arial,sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase}.aside-note .star{font-family:Georgia;font-size:29px;color:var(--gold)}
+/* An entirely CSS-painted digital altar */
+.altar-wrap{height:690px;position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;overflow:visible}
+.altar-wrap:before{content:"";position:absolute;width:120%;height:99%;left:-5%;top:0;background:radial-gradient(ellipse at 50% 48%,rgba(193,74,117,.20),rgba(122,43,75,.09) 38%,transparent 72%);filter:blur(35px);z-index:-2}
+.arch{width:min(92%,525px);height:605px;position:relative;margin-top:22px;border-radius:48% 48% 7% 7%/33% 33% 4% 4%;border:1px solid rgba(225,171,187,.44);box-shadow:0 0 0 8px rgba(227,149,173,.035),0 0 0 9px rgba(225,171,187,.16),0 0 0 19px rgba(225,171,187,.018),0 0 0 20px rgba(225,171,187,.08),inset 0 0 40px rgba(250,151,189,.08),0 50px 100px rgba(0,0,0,.32);background:radial-gradient(circle at 50% 43%,#512138 0%,#2b1626 33%,#15101b 65%,#110e16 90%);overflow:hidden}
+.arch:before{content:"";position:absolute;inset:15px;border:1px solid rgba(237,198,193,.28);border-radius:47% 47% 6% 6%/31% 31% 4% 4%;pointer-events:none}
+.arch:after{content:"";position:absolute;inset:30px 28px;background:repeating-linear-gradient(90deg,transparent 0 74px,rgba(238,157,176,.035) 75px 76px);opacity:.35;mask-image:linear-gradient(transparent,black 30%,black 90%,transparent);pointer-events:none}
+.arch-star{position:absolute;color:rgba(237,189,189,.69);font-size:15px;z-index:3;pointer-events:none}.s1{top:100px;left:77px}.s2{top:175px;right:51px;font-size:9px}.s3{top:275px;left:54px;font-size:11px}.s4{top:315px;right:69px;font-size:19px}.s5{top:67px;right:148px;font-size:9px}
+.rose-window{position:absolute;left:50%;top:44%;width:335px;height:335px;transform:translate(-50%,-50%);border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(239,158,178,.16) 0deg 1deg,transparent 1deg 15deg);opacity:.8;animation:rotateWindow 100s linear infinite}
+.rose-window:before{content:"";position:absolute;inset:21px;border:1px solid rgba(221,158,172,.44);border-radius:50%;box-shadow:0 0 0 25px rgba(240,147,177,.025),0 0 0 26px rgba(240,147,177,.26),0 0 0 50px rgba(240,147,177,.01)}
+.rose-window:after{content:"";position:absolute;inset:65px;border-radius:50%;border:1px dotted rgba(226,161,172,.45)}
+.halo{position:absolute;width:265px;height:265px;top:43%;left:50%;transform:translate(-50%,-50%);border-radius:50%;z-index:2;background:radial-gradient(circle at 40% 34%,#de9aaf 0%,#bb587e 13%,#743251 36%,#341528 66%,#190e19 75%);box-shadow:inset -18px -24px 38px rgba(0,0,0,.36),inset 10px 14px 25px rgba(255,216,221,.16),0 0 45px rgba(244,117,160,.29),0 0 110px rgba(244,117,160,.12)}
+.halo:before{content:"";position:absolute;inset:-15px;border:1px solid rgba(241,177,190,.42);border-radius:50%}.halo:after{content:"";position:absolute;inset:9px;border:1px solid rgba(255,209,211,.21);border-radius:50%}
+.halo-center{position:absolute;z-index:4;top:43%;left:50%;transform:translate(-50%,-50%);text-align:center;width:240px;text-shadow:0 2px 18px rgba(44,10,29,.8);pointer-events:none}.halo-center .mark{display:block;color:#ffe9e7;font-size:112px;line-height:1;letter-spacing:-.16em;margin-left:-14px;font-style:italic}.halo-center .under-mark{display:block;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.42em;font-size:8px;color:#edd4d8;margin-top:5px}
+.halo-pulse .halo{animation:heartbeat 1.2s ease-out 1}
+.altar-letter{position:absolute;bottom:107px;left:50%;transform:translateX(-50%) rotate(-2deg);width:187px;height:112px;z-index:6;background:linear-gradient(143deg,#f1e0d8,#bea2a9 65%,#d5b9b9);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);box-shadow:0 18px 20px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
+.altar-letter:before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,transparent 49.5%,rgba(123,69,80,.24) 50%,transparent 50.5%),linear-gradient(210deg,transparent 49.5%,rgba(123,69,80,.25) 50%,transparent 50.5%);opacity:.6}
+.wax{position:relative;display:grid;place-items:center;border-radius:50%;height:45px;width:45px;z-index:1;background:radial-gradient(circle at 32% 25%,#bb6785,#68223e 72%);border:2px solid rgba(118,43,65,.8);box-shadow:0 3px 10px rgba(40,10,23,.35),inset 0 0 0 2px rgba(255,215,220,.23);font-style:italic;color:#edbacb;font-size:30px;transform:rotate(2deg)}
+.plinth{position:absolute;bottom:60px;left:5%;width:90%;height:47px;background:linear-gradient(#482d3e 0 17%,#18121c 19% 56%,#30212c 58% 66%,#0e0c11 68%);border:1px solid rgba(205,165,166,.34);border-radius:50%/15%;z-index:5;box-shadow:0 16px 25px rgba(0,0,0,.6)}
+.candle{position:absolute;bottom:78px;height:117px;width:26px;z-index:7;background:linear-gradient(90deg,#946e70,#e5c3ba 25%,#f1ded2 49%,#b18a86 90%);border-radius:3px 3px 1px 1px;box-shadow:0 0 16px rgba(255,179,162,.18)}.candle:before{content:"";position:absolute;width:3px;height:12px;background:#24171a;top:-10px;left:12px}.candle:after{content:"";position:absolute;width:18px;height:32px;left:4px;top:-40px;background:radial-gradient(ellipse at 50% 65%,#fff7da 0 15%,#ffbb8b 35%,#d16b75 60%,transparent 72%);border-radius:55% 55% 50% 50%;filter:drop-shadow(0 0 12px #f18b8a);animation:flicker 2s ease-in-out infinite alternate;transform-origin:bottom center}.candle.left{left:18%;height:142px}.candle.right{right:16%;height:94px;animation-delay:-.7s}.candle.tiny{left:29%;height:77px;width:20px}.candle.tiny:before{left:9px}.candle.tiny:after{left:2px}
+.side-inscription{position:absolute;z-index:3;bottom:33px;text-align:center;width:100%;font-family:Arial,Helvetica,sans-serif;text-transform:uppercase;font-size:9px;letter-spacing:.35em;color:rgba(228,187,190,.57)}
+.sigil{position:absolute;z-index:7;color:#cf9fae;opacity:.8;font-size:18px;pointer-events:none;animation:floatSigil 9s ease-in-out infinite alternate}.sigil.a{top:17%;left:15%}.sigil.b{top:23%;right:11%;animation-delay:-3s}.sigil.c{bottom:19%;left:7%;animation-delay:-6s}.sigil.d{bottom:11%;right:9%;font-size:12px;animation-delay:-1s}
+.vertical-note{position:absolute;right:-6px;top:51%;transform:rotate(90deg) translateX(50%);transform-origin:right center;font-family:Arial,sans-serif;font-size:9px;letter-spacing:.27em;color:rgba(216,184,191,.48);text-transform:uppercase;white-space:nowrap}
+/* The invitation */
+.dividing-line{border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;padding:22px 0 0;color:#b5a7b0;font:10px Arial,Helvetica,sans-serif;text-transform:uppercase;letter-spacing:.22em}.dividing-line span:last-child{color:var(--rose)}
+.ritual{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(35px,7vw,120px);padding:94px 0 110px}
+.section-number{font:11px Arial,Helvetica,sans-serif;color:var(--rose);letter-spacing:.3em}.section-title{font-size:clamp(44px,4.1vw,68px);line-height:1.06;letter-spacing:-.06em;font-weight:normal;margin:18px 0 14px}.section-title i{color:var(--rose);font-weight:normal}
+.section-desc{color:#b3a5b0;font-size:17px;line-height:1.65;max-width:530px;margin:0 0 36px}
+.label{font:10px Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#d8c2c9;display:block;margin:0 0 13px}
+.types{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 27px}
+.type{border:1px solid rgba(234,199,201,.31);border-radius:0;background:transparent;color:#bdb0bb;padding:13px 16px;font:10px Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;transition:.2s}.type:hover{border-color:var(--rose);color:white}.type.selected{background:var(--rose);color:#25151d;border-color:var(--rose)}
+textarea{display:block;width:100%;height:147px;resize:vertical;min-height:110px;max-height:280px;background:rgba(247,226,228,.055);color:var(--pale);border:1px solid rgba(234,199,201,.34);border-radius:0;padding:20px 21px;font-size:19px;line-height:1.45;outline:none;transition:border .25s,background .25s}
+textarea::placeholder{color:#7b727e;font-style:italic}textarea:focus{border-color:var(--rose);background:rgba(247,226,228,.085)}
+.form-bottom{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:11px 0 25px;font:10px Arial,sans-serif;color:#8f828d;letter-spacing:.08em}.privacy{color:#a99ba5}
+.form-submit{width:100%;justify-content:space-between}.form-submit:disabled{background:#6f5b64;border-color:#6f5b64;color:#bdb0b8;cursor:not-allowed;transform:none;box-shadow:none}
+.result{min-height:51px;padding:16px 0 0;color:var(--rose);font-size:17px;font-style:italic;line-height:1.4}
+.archive{padding:31px 32px 28px;border:1px solid var(--line);position:relative;align-self:start;background:linear-gradient(150deg,rgba(248,203,214,.055),rgba(248,203,214,.008))}.archive:before{content:"✣";position:absolute;right:26px;top:-19px;color:var(--rose);font-size:31px;background:var(--night);padding:0 12px}
+.archive-top{display:flex;justify-content:space-between;align-items:start;gap:20px;border-bottom:1px solid var(--line);padding-bottom:22px}.archive-title{font-size:27px;font-weight:normal;margin:0;letter-spacing:-.04em}.counter{font:11px Arial,sans-serif;color:var(--rose);letter-spacing:.13em;border:1px solid rgba(238,180,194,.33);padding:9px 10px;white-space:nowrap}
+.archive-intro{font-style:italic;color:#a899a3;line-height:1.65;font-size:16px;margin:20px 0 6px}
+.offering-list{margin-top:20px;min-height:224px}.empty-archive{color:#82757e;text-align:center;padding:54px 16px;font-style:italic;font-size:18px;line-height:1.6}.empty-archive:before{content:"✧";display:block;color:#997180;font-size:32px;margin-bottom:10px}
+.entry{display:grid;grid-template-columns:32px 1fr;gap:13px;padding:17px 0;border-top:1px solid rgba(241,210,213,.12);animation:entryIn .6s ease backwards}.entry-icon{color:var(--rose);font-size:19px}.entry-type{font:9px Arial,Helvetica,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:#a998a5;margin:0 0 8px}.entry-words{font-size:18px;line-height:1.45;color:#e6d6dc;margin:0;overflow-wrap:anywhere}.entry-new{color:var(--rose)}
+.archive-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:20px;margin-top:12px;gap:20px}.archive-foot small{font:9px Arial,sans-serif;text-transform:uppercase;color:#887b87;letter-spacing:.14em}.clear{background:none;border:0;color:#bfa3ae;padding:8px 0;text-transform:uppercase;font:10px Arial,sans-serif;letter-spacing:.17em}.clear:hover{color:var(--hot);text-decoration:underline}.clear:disabled{opacity:.35;cursor:default;text-decoration:none}
+.manifesto{margin:0 0 90px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:48px 0 50px;display:grid;grid-template-columns:1fr 3fr;gap:35px;align-items:start}.manifesto>span{font:10px Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);padding-top:9px}.manifesto p{font-size:clamp(23px,3vw,40px);line-height:1.28;margin:0;letter-spacing:-.03em;color:#d0c0c7}.manifesto em{color:var(--rose)}
+footer{display:flex;justify-content:space-between;gap:20px;align-items:center;padding-bottom:38px;color:#968894;font:10px Arial,sans-serif;letter-spacing:.19em;text-transform:uppercase}footer b{font-size:18px;font-family:Georgia;color:var(--rose);font-style:italic;text-transform:none}
+/* Transient visual remnants rise toward the shrine */
+.particle-layer{position:fixed;inset:0;pointer-events:none;z-index:20;overflow:hidden}.ember{position:absolute;width:var(--sz);height:var(--sz);left:var(--x);top:var(--y);border-radius:50%;background:var(--c);box-shadow:0 0 15px var(--c);opacity:0;animation:emberRise var(--dur) ease-out forwards}.released-words{position:absolute;left:var(--x);top:var(--y);width:min(75vw,440px);max-width:440px;text-align:center;color:#ffe5eb;font-size:clamp(19px,2.6vw,30px);line-height:1.24;font-style:italic;text-shadow:0 0 16px #f77a9f,0 0 42px rgba(249,135,178,.85);overflow-wrap:anywhere;animation:wordsRelease 2.35s cubic-bezier(.2,.7,.3,1) forwards;transform:translate(-50%,-50%)}.release-ring{position:absolute;left:var(--x);top:var(--y);width:95px;height:95px;border:2px solid rgba(255,204,217,.9);border-radius:50%;box-shadow:0 0 30px #f99abc,inset 0 0 25px #f99abc;animation:ringRelease 1.35s ease-out forwards}.constellation{position:absolute;inset:0;pointer-events:none;z-index:11}.ghost{position:absolute;width:9px;height:9px;transform:rotate(45deg);background:#f3bac9;border:1px solid #fff4ea;box-shadow:0 0 18px #f7b1c9;animation:appearGhost 1s ease both,ghostBreath 7s ease-in-out 1s infinite alternate}
+.toast{position:fixed;z-index:30;bottom:26px;left:50%;transform:translate(-50%,18px);max-width:calc(100% - 32px);background:#edd5d9;color:#301b2a;padding:18px 25px;box-shadow:0 12px 45px rgba(0,0,0,.45);font:12px Arial,sans-serif;letter-spacing:.07em;text-align:center;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}.toast.show{opacity:1;transform:translate(-50%,0)}
+@keyframes flicker{0%{transform:scale(.9) rotate(-6deg);opacity:.85}50%{transform:scale(1.06) rotate(4deg);opacity:1}100%{transform:scale(.94) rotate(-2deg);opacity:.85}}
+@keyframes floatSigil{0%{translate:0 0;opacity:.35}100%{translate:0 -15px;opacity:.95}}
+@keyframes rotateWindow{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes heartbeat{30%{transform:scale(1.085)}70%{transform:scale(.98)}100%{transform:scale(1)}}
+@keyframes emberRise{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.03)}}
+@keyframes wordsRelease{0%{opacity:0;transform:translate(-50%,-40%) scale(.88);filter:blur(4px)}22%{opacity:1;filter:blur(0)}52%{opacity:1;transform:translate(-50%,-85%) scale(1.04)}100%{opacity:0;transform:translate(-50%,-210%) scale(1.27);filter:blur(13px)}}
+@keyframes ringRelease{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}24%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(6)}}
+@keyframes entryIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes appearGhost{from{opacity:0;transform:scale(0) rotate(45deg)}to{opacity:.85;transform:scale(1) rotate(45deg)}}
+@keyframes ghostBreath{to{opacity:.28;transform:translateY(-15px) scale(.7) rotate(45deg)}}
+@media(max-width:1100px){.hero{grid-template-columns:1fr 1fr;min-height:600px}.altar-wrap{height:610px}.arch{transform:scale(.84);transform-origin:center}.intro{padding:60px 0}h1{font-size:clamp(76px,8.8vw,112px)}.vertical-note{display:none}.ritual{gap:50px}}
+@media(max-width:770px){.topbar{height:73px}.topbar-right .micro{display:none}.hero{display:flex;flex-direction:column;gap:0;align-items:stretch;min-height:0}.intro{padding:73px 0 0}h1{font-size:clamp(74px,15vw,115px);max-width:620px;margin-top:28px}.lede{font-size:21px;margin-top:34px}.altar-wrap{height:590px;margin:8px auto 10px;width:100%;max-width:550px;overflow:hidden}.arch{transform:scale(.84)}.ritual{grid-template-columns:1fr;gap:55px;padding:72px 0 80px}.manifesto{grid-template-columns:1fr;gap:20px}.manifesto p{font-size:29px}}
+@media(max-width:480px){.shell{padding:0 21px}.brand{font-size:12px;letter-spacing:.16em}.brand span{margin-right:5px}.sound{font-size:9px;padding:10px 12px}.intro{padding-top:54px}h1{font-size:clamp(66px,15vw,91px)}.eyebrow{font-size:9px;letter-spacing:.21em}.lede{font-size:18px}.cta{padding:16px 18px;gap:26px;font-size:10px}.altar-wrap{height:540px;margin:0 auto;overflow:hidden}.arch{transform:scale(.85);flex-shrink:0}.sigil{display:none}.dividing-line{font-size:8px;letter-spacing:.11em}.archive{padding:26px 20px}.section-title{font-size:48px}.section-desc{font-size:16px}.type{padding:12px 11px;font-size:9px}.manifesto{margin-bottom:60px}footer{align-items:start;flex-direction:column;line-height:1.8}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div class="brand"><span>✣</span> THE SHRINE OF ALMOST</div>
+  <div class="topbar-right"><div class="micro">An interactive digital monument<br>To everything that never was</div><button id="soundToggle" class="sound" type="button" aria-pressed="false">♪ SOUND OFF</button></div>
+</header>
+<main>
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="intro">
+      <div class="eyebrow">01 / A secular confession</div>
+      <h1 id="heroTitle"><span>THE</span><span>SHRINE</span><em>of almost.</em></h1>
+      <p class="lede">For the words you swallowed. The doors you never opened. The people you <strong>might have become.</strong></p>
+      <button class="cta" id="begin" type="button"><span>LEAVE AN OFFERING</span><span class="arrow" aria-hidden="true">↘</span></button>
+      <div class="aside-note"><span class="star">✳</span><span>No gods. No judgment.<br>Just an altar for possibility.</span></div>
+    </div>
+    <div class="altar-wrap" id="altarWrap" aria-label="Animated ornamental altar, with a glowing rose-colored orb and flickering candles">
+      <span class="sigil a">✶</span><span class="sigil b">✣</span><span class="sigil c">✧</span><span class="sigil d">✦</span>
+      <div class="arch" id="arch">
+        <span class="arch-star s1">✦</span><span class="arch-star s2">✶</span><span class="arch-star s3">✧</span><span class="arch-star s4">✦</span><span class="arch-star s5">✣</span>
+        <div class="rose-window"></div><div class="halo"></div>
+        <div class="halo-center"><span class="mark">a</span><span class="under-mark">ALL THE UNLIVED LIVES</span></div>
+        <div class="constellation" id="constellation" aria-hidden="true"></div>
+        <div class="altar-letter"><span class="wax">a</span></div>
+        <div class="candle left"></div><div class="candle tiny"></div><div class="candle right"></div>
+        <div class="plinth"></div><div class="side-inscription">EST. IN THE SPACE BETWEEN IF &amp; ONLY</div>
+      </div>
+      <div class="vertical-note">THE THINGS THAT DID NOT HAPPEN STILL EXIST HERE</div>
+    </div>
+  </section>
+  <div class="dividing-line"><span>THE UNFINISHED IS STILL SACRED</span><span>SCROLL TO BEGIN ↓</span></div>
+  <section class="ritual" id="ritual" aria-labelledby="ritualTitle">
+    <div>
+      <div class="section-number">02 / THE RITUAL</div>
+      <h2 class="section-title" id="ritualTitle">Give your <i>almost</i><br>somewhere to go.</h2>
+      <p class="section-desc">Choose what kind of ghost you've brought. Write it down. Offer it to the shrine. Watch it turn into a small, luminous thing.</p>
+      <form id="offeringForm">
+        <span class="label" id="categoryLabel">I am offering...</span>
+        <div class="types" role="group" aria-labelledby="categoryLabel">
+          <button type="button" class="type selected" data-type="Unsaid words" aria-pressed="true">01 / UNSAID WORDS</button>
+          <button type="button" class="type" data-type="Unchosen paths" aria-pressed="false">02 / UNCHOSEN PATHS</button>
+          <button type="button" class="type" data-type="Unfinished dreams" aria-pressed="false">03 / UNFINISHED DREAMS</button>
+        </div>
+        <label for="offeringText" class="label">THE THING THAT ALMOST WAS</label>
+        <textarea id="offeringText" maxlength="200" required placeholder="I almost told you that..." aria-describedby="privacyNote"></textarea>
+        <div class="form-bottom"><span class="privacy" id="privacyNote">✳ This stays in your browser. Nothing is sent anywhere.</span><span id="characters">0 / 200</span></div>
+        <button class="cta form-submit" type="submit" id="offerButton" disabled><span>OFFER IT TO THE VOID</span><span class="arrow" aria-hidden="true">✦</span></button>
+        <div id="result" class="result" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+    <aside class="archive" aria-labelledby="archiveTitle">
+      <div class="archive-top"><h2 id="archiveTitle" class="archive-title">The book of almosts.</h2><span id="count" class="counter">00 OFFERINGS</span></div>
+      <p class="archive-intro">A tiny, temporary archive of everything you've let go of in this visit.</p>
+      <div class="offering-list" id="offeringList"><div class="empty-archive">The pages are waiting.<br>What will you leave here?</div></div>
+      <div class="archive-foot"><small>Nothing saved after you leave</small><button class="clear" id="clearArchive" type="button" disabled>Clear the altar ↗</button></div>
+    </aside>
+  </section>
+  <div class="manifesto"><span>03 / A NOTE FROM THE SHRINE</span><p>Not everything needs to happen to have mattered. <em>Some possibilities are beautiful precisely because they remained possibilities.</em></p></div>
+</main>
+<footer><b>almost, always.</b><span>SHRINE / INTERACTIVE ART EXPERIMENT</span><span>DESIGNED TO BE LET GO</span></footer>
+</div>
+<div class="particle-layer" id="particleLayer" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const form=$('offeringForm'), field=$('offeringText'), list=$('offeringList');
+  const count=$('count'), result=$('result'), clear=$('clearArchive'), characters=$('characters');
+  const arch=$('arch'), wrap=$('altarWrap'), constellation=$('constellation'), particles=$('particleLayer');
+  const categories=[...document.querySelectorAll('.type')];
+  const replies=['Somewhere, it happened. Here, it has a home.','The void has received what you could not carry.','A possibility is still a kind of life.','Consider this the smallest possible monument.','Not everything lost was ever yours to keep.','Let the almost become a little light.'];
+  let chosen='Unsaid words', entries=[], soundEnabled=false, audioCtx, toastTimeout;
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  $('begin').addEventListener('click',()=>{$('ritual').scrollIntoView({behavior:reduceMotion.matches?'instant':'smooth'});setTimeout(()=>field.focus({preventScroll:true}),reduceMotion.matches?0:650)});
+  categories.forEach(b=>b.addEventListener('click',()=>{
+    chosen=b.dataset.type;
+    categories.forEach(x=>{const yes=x===b;x.classList.toggle('selected',yes);x.setAttribute('aria-pressed',String(yes))});
+    const placeholders={'Unsaid words':'I almost told you that...','Unchosen paths':'I nearly took the train to...','Unfinished dreams':'I wanted to become...'};
+    field.placeholder=placeholders[chosen];
+  }));
+  field.addEventListener('input',()=>{characters.textContent=field.value.length+' / 200';$('offerButton').disabled=!field.value.trim()});
+  $('soundToggle').addEventListener('click',e=>{
+    soundEnabled=!soundEnabled;e.currentTarget.classList.toggle('active',soundEnabled);
+    e.currentTarget.setAttribute('aria-pressed',String(soundEnabled));e.currentTarget.textContent=soundEnabled?'♪ SOUND ON':'♪ SOUND OFF';
+    if(soundEnabled)chime(true);
+  });
+  function chime(preview=false){
+    if(!soundEnabled)return;
+    try{
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==='suspended')audioCtx.resume();
+      const now=audioCtx.currentTime, notes=preview?[523.25,783.99]:[392,523.25,659.25,987.77];
+      notes.forEach((freq,i)=>{
+        const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+        osc.type='sine';osc.frequency.setValueAtTime(freq,now+i*.13);
+        gain.gain.setValueAtTime(.00001,now+i*.13);
+        gain.gain.exponentialRampToValueAtTime(.032,now+i*.13+.025);
+        gain.gain.exponentialRampToValueAtTime(.00001,now+i*.13+1.6);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(now+i*.13);osc.stop(now+i*.13+1.7);
+      });
+    }catch(e){/* Sound is optional. The visual ritual still works. */}
+  }
+  function showToast(message){const t=$('toast');t.textContent=message;t.classList.add('show');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.classList.remove('show'),3700)}
+  function spark(words){
+    // Release the confession right over the visible ritual form, not off-screen at the altar.
+    if(reduceMotion.matches)return;
+    const r=field.getBoundingClientRect();
+    const ox=r.left+r.width/2,oy=r.top+r.height*.50;
+    const ghost=document.createElement('div');ghost.className='released-words';
+    ghost.textContent='“'+(words.length>72?words.slice(0,69)+'…':words)+'”';
+    ghost.style.setProperty('--x',ox+'px');ghost.style.setProperty('--y',oy+'px');
+    particles.appendChild(ghost);ghost.addEventListener('animationend',()=>ghost.remove(),{once:true});
+    const ring=document.createElement('div');ring.className='release-ring';
+    ring.style.setProperty('--x',ox+'px');ring.style.setProperty('--y',oy+'px');
+    particles.appendChild(ring);ring.addEventListener('animationend',()=>ring.remove(),{once:true});
+    for(let i=0;i<85;i++){
+      const p=document.createElement('span');p.className='ember';
+      const a=Math.random()*Math.PI*2,spread=55+Math.random()*240;
+      p.style.setProperty('--sz',2+Math.random()*6+'px');
+      p.style.setProperty('--x',ox+(Math.random()-.5)*Math.min(175,r.width*.65)+'px');
+      p.style.setProperty('--y',oy+(Math.random()-.5)*Math.min(95,r.height*.8)+'px');
+      p.style.setProperty('--dx',Math.cos(a)*spread+'px');
+      p.style.setProperty('--dy',Math.sin(a)*spread-115-Math.random()*95+'px');
+      p.style.setProperty('--dur',(1.1+Math.random()*1.3)+'s');
+      p.style.setProperty('--c',Math.random()>.45?'#ffb7c9':'#f1d7bb');
+      particles.appendChild(p);p.addEventListener('animationend',()=>p.remove(),{once:true});
+    }
+  }
+  function addGhost(){
+    const g=document.createElement('span');g.className='ghost';
+    const index=entries.length, a=index*2.399963229728653;
+    g.style.left=50+Math.cos(a)*(23+index%5*6)+'%';g.style.top=41+Math.sin(a)*(18+index%5*6)+'%';
+    constellation.appendChild(g);
+    if(constellation.children.length>22)constellation.firstElementChild.remove();
+  }
+  function render(){
+    list.replaceChildren();
+    if(!entries.length){const e=document.createElement('div');e.className='empty-archive';e.innerHTML='The pages are waiting.<br>What will you leave here?';list.appendChild(e)}
+    else entries.slice().reverse().forEach((entry,i)=>{
+      const row=document.createElement('article');row.className='entry';
+      const mark=document.createElement('div');mark.className='entry-icon';mark.textContent=entry.type==='Unsaid words'?'✳':entry.type==='Unchosen paths'?'◇':'✦';
+      const body=document.createElement('div'),type=document.createElement('p'),words=document.createElement('p');
+      type.className='entry-type';type.textContent=entry.type;words.className='entry-words';words.textContent='“'+entry.words+'”';
+      body.append(type,words);row.append(mark,body);list.appendChild(row);
+    });
+    count.textContent=String(entries.length).padStart(2,'0')+' OFFERING'+(entries.length===1?'':'S');
+    clear.disabled=!entries.length;
+  }
+  form.addEventListener('submit',e=>{
+    e.preventDefault();const words=field.value.trim();if(!words)return;
+    entries.push({type:chosen,words});render();addGhost();spark(words);chime();
+    arch.classList.remove('halo-pulse');void arch.offsetWidth;arch.classList.add('halo-pulse');
+    const reply=replies[(entries.length-1)%replies.length];result.textContent='✦ '+reply;showToast('YOUR ALMOST HAS BEEN RECEIVED');
+    field.value='';characters.textContent='0 / 200';$('offerButton').disabled=true;
+    field.focus({preventScroll:true});
+  });
+  clear.addEventListener('click',()=>{
+    entries=[];render();constellation.replaceChildren();result.textContent='The altar is empty again.';showToast('ALL OFFERINGS RELEASED');
+  });
+})();
+</script>
+</body>
+</html>
